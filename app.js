@@ -1,0 +1,648 @@
+(function(){
+  "use strict";
+
+  var QUESTIONS = JSON.parse(document.getElementById('qdata').textContent);
+  var TOPICS = [];
+  QUESTIONS.forEach(function(q){ if (TOPICS.indexOf(q.topic) === -1) TOPICS.push(q.topic); });
+
+  var LETTERS = ['A','B','C','D'];
+
+  var state = {
+    feedbackMode: 'exam',
+    testQuestions: [],
+    answers: {},
+    marked: {},
+    current: 0,
+    timed: false,
+    remainingSec: 0,
+    timerId: null,
+    startedAt: null,
+    finishedAt: null,
+    reviewFilter: 'all',
+    selectedTopics: {}
+  };
+
+  function $(id){ return document.getElementById(id); }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+  function shuffle(arr){
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function pad2(n){ return n < 10 ? '0' + n : '' + n; }
+  function fmtTime(sec){
+    sec = Math.max(0, Math.round(sec));
+    var m = Math.floor(sec / 60), s = sec % 60;
+    return pad2(m) + ':' + pad2(s);
+  }
+
+  /* ---------------- screen switching ---------------- */
+  function showScreen(name){
+    ['start','test','results'].forEach(function(n){
+      $('screen-' + n).hidden = (n !== name);
+    });
+    $('topbar').hidden = (name !== 'test');
+    $('jump-strip').hidden = (name !== 'test');
+    window.scrollTo(0,0);
+  }
+
+  /* ---------------- START SCREEN ---------------- */
+  function renderStartScreen(){
+    var chipsWrap = $('topic-chips');
+    chipsWrap.innerHTML = TOPICS.map(function(t){
+      return '<button type="button" class="topic-chip" data-topic="' + escapeHtml(t) + '">' + escapeHtml(t) + '</button>';
+    }).join('');
+    chipsWrap.querySelectorAll('.topic-chip').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var t = btn.getAttribute('data-topic');
+        if (state.selectedTopics[t]) { delete state.selectedTopics[t]; btn.classList.remove('selected'); }
+        else { state.selectedTopics[t] = true; btn.classList.add('selected'); }
+        var n = Object.keys(state.selectedTopics).length;
+        var startBtn = $('start-topic');
+        startBtn.disabled = n === 0;
+        startBtn.textContent = n === 0 ? 'Select topics to start' :
+          ('Start practice — ' + (n * 4) + ' question' + (n * 4 === 1 ? '' : 's'));
+      });
+    });
+
+    var cov = $('coverage-list');
+    cov.innerHTML = TOPICS.map(function(t){
+      var count = QUESTIONS.filter(function(q){ return q.topic === t; }).length;
+      return '<li><span>' + escapeHtml(t) + '</span><span>' + count + ' question' + (count === 1 ? '' : 's') + '</span></li>';
+    }).join('');
+
+    updateModeMeta();
+  }
+
+  function updateModeMeta(){
+    var timed = state.feedbackMode === 'exam';
+    $('full-meta').textContent = timed ? '100 min, timed' : 'Untimed, instant feedback';
+    $('quick-meta').textContent = timed ? '20 min, timed' : 'Untimed, instant feedback';
+    $('feedback-hint').textContent = timed
+      ? 'Answers are hidden until you submit, with a countdown timer.'
+      : 'See the correct answer and solution right after each question, no clock.';
+  }
+
+  document.querySelectorAll('.mode-toggle-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.mode-toggle-btn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      state.feedbackMode = btn.getAttribute('data-feedback');
+      updateModeMeta();
+    });
+  });
+
+  $('start-full').addEventListener('click', function(){
+    beginTest(QUESTIONS.slice());
+  });
+  $('start-quick').addEventListener('click', function(){
+    beginTest(shuffle(QUESTIONS).slice(0, 20));
+  });
+  $('start-topic').addEventListener('click', function(){
+    var topics = Object.keys(state.selectedTopics);
+    if (!topics.length) return;
+    beginTest(QUESTIONS.filter(function(q){ return topics.indexOf(q.topic) !== -1; }));
+  });
+
+  /* ---------------- TEST SCREEN ---------------- */
+  function beginTest(questions){
+    state.testQuestions = questions;
+    state.answers = {};
+    state.marked = {};
+    state.current = 0;
+    state.timed = state.feedbackMode === 'exam';
+    state.remainingSec = questions.length * 60;
+    state.startedAt = Date.now();
+    state.finishedAt = null;
+    clearInterval(state.timerId);
+
+    buildJumpStrip();
+    showScreen('test');
+    renderQuestion(0);
+
+    if (state.timed) {
+      $('timer').hidden = false;
+      updateTimerDisplay();
+      state.timerId = setInterval(function(){
+        state.remainingSec--;
+        updateTimerDisplay();
+        if (state.remainingSec <= 0) {
+          clearInterval(state.timerId);
+          submitTest(true);
+        }
+      }, 1000);
+    } else {
+      $('timer').hidden = true;
+    }
+  }
+
+  function updateTimerDisplay(){
+    var el = $('timer');
+    el.textContent = fmtTime(state.remainingSec);
+    el.classList.toggle('timer--low', state.remainingSec <= 60);
+  }
+
+  function buildJumpStrip(){
+    var strip = $('jump-strip');
+    strip.innerHTML = state.testQuestions.map(function(q, i){
+      return '<button type="button" class="jump-dot" data-i="' + i + '">' + (i + 1) + '</button>';
+    }).join('');
+    strip.querySelectorAll('.jump-dot').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        state.current = parseInt(btn.getAttribute('data-i'), 10);
+        renderQuestion(state.current);
+      });
+    });
+  }
+
+  function refreshJumpStrip(){
+    $('jump-strip').querySelectorAll('.jump-dot').forEach(function(btn){
+      var i = parseInt(btn.getAttribute('data-i'), 10);
+      btn.classList.toggle('answered', !!state.answers[i]);
+      btn.classList.toggle('marked', !!state.marked[i]);
+      btn.classList.toggle('current', i === state.current);
+    });
+  }
+
+  function renderQuestion(i){
+    var total = state.testQuestions.length;
+    var q = state.testQuestions[i];
+
+    $('qcounter').textContent = 'Question ' + (i + 1) + ' of ' + total;
+    $('progress-fill').style.width = (((i + 1) / total) * 100) + '%';
+
+    $('q-topic').textContent = q.topic;
+    var diffChip = $('q-diff');
+    diffChip.textContent = q.difficulty;
+    diffChip.setAttribute('data-d', q.difficulty);
+
+    $('q-stem').textContent = q.question;
+
+    var userAns = state.answers[i];
+    var revealed = userAns && state.feedbackMode === 'practice';
+
+    var optsHtml = LETTERS.map(function(letter){
+      if (!(letter in q.options)) return '';
+      var classes = ['option'];
+      if (userAns === letter && !revealed) classes.push('selected');
+      if (revealed) {
+        if (letter === q.answer) classes.push('reveal-correct');
+        else if (letter === userAns) classes.push('reveal-wrong');
+      }
+      return '<button type="button" class="' + classes.join(' ') + '" data-letter="' + letter + '"' +
+        (revealed ? ' disabled' : '') + '>' +
+        '<span class="option-letter">' + letter + '</span>' +
+        '<span class="option-text">' + escapeHtml(q.options[letter]) + '</span>' +
+        '</button>';
+    }).join('');
+    $('options').innerHTML = optsHtml;
+
+    $('options').querySelectorAll('.option').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        selectOption(i, btn.getAttribute('data-letter'));
+      });
+    });
+
+    var panel = $('feedback-panel');
+    if (revealed) {
+      var isCorrect = userAns === q.answer;
+      panel.hidden = false;
+      panel.className = 'feedback-panel ' + (isCorrect ? 'is-correct' : 'is-wrong');
+      panel.innerHTML = '<b>' + (isCorrect ? 'Correct.' : 'Not quite — correct answer is ' + q.answer + '.') + '</b> ' +
+        escapeHtml(q.solution);
+    } else {
+      panel.hidden = true;
+      panel.innerHTML = '';
+    }
+
+    var markBtn = $('btn-mark');
+    markBtn.textContent = state.marked[i] ? 'Marked for review' : 'Mark for review';
+    markBtn.classList.toggle('is-marked', !!state.marked[i]);
+
+    $('btn-prev').disabled = i === 0;
+    var nextBtn = $('btn-next');
+    if (i === total - 1) {
+      nextBtn.textContent = 'Finish';
+    } else {
+      nextBtn.textContent = 'Next';
+    }
+
+    refreshJumpStrip();
+  }
+
+  function selectOption(i, letter){
+    if (state.feedbackMode === 'practice' && state.answers[i]) return; // locked after reveal
+    state.answers[i] = letter;
+    renderQuestion(i);
+  }
+
+  $('btn-mark').addEventListener('click', function(){
+    var i = state.current;
+    if (state.marked[i]) delete state.marked[i]; else state.marked[i] = true;
+    renderQuestion(i);
+  });
+
+  $('btn-prev').addEventListener('click', function(){
+    if (state.current > 0) { state.current--; renderQuestion(state.current); }
+  });
+  $('btn-next').addEventListener('click', function(){
+    if (state.current < state.testQuestions.length - 1) {
+      state.current++; renderQuestion(state.current);
+    } else {
+      confirmSubmit();
+    }
+  });
+
+  $('btn-exit').addEventListener('click', function(){
+    openModal(
+      'Exit this test?',
+      'Your progress on this attempt will be lost.',
+      'Exit test',
+      function(){ clearInterval(state.timerId); showScreen('start'); }
+    );
+  });
+
+  function confirmSubmit(){
+    var total = state.testQuestions.length;
+    var answered = Object.keys(state.answers).length;
+    var unanswered = total - answered;
+    var marked = Object.keys(state.marked).length;
+    var msg = answered + ' of ' + total + ' answered.';
+    if (unanswered > 0) msg += ' ' + unanswered + ' question' + (unanswered === 1 ? '' : 's') + ' left blank.';
+    if (marked > 0) msg += ' ' + marked + ' marked for review.';
+    openModal('Submit this test?', msg, 'Submit', function(){
+      clearInterval(state.timerId);
+      submitTest(false);
+    });
+  }
+
+  /* ---------------- MODAL ---------------- */
+  function openModal(title, body, confirmLabel, onConfirm){
+    $('modal-title').textContent = title;
+    $('modal-body').textContent = body;
+    $('modal-confirm').textContent = confirmLabel;
+    $('modal-backdrop').hidden = false;
+    var confirmBtn = $('modal-confirm');
+    var handler = function(){
+      $('modal-backdrop').hidden = true;
+      confirmBtn.removeEventListener('click', handler);
+      onConfirm();
+    };
+    confirmBtn.addEventListener('click', handler);
+  }
+  $('modal-cancel').addEventListener('click', function(){ $('modal-backdrop').hidden = true; });
+
+  /* ---------------- RESULTS ---------------- */
+  var lastResults = null;
+
+  function submitTest(auto){
+    state.finishedAt = Date.now();
+    var records = state.testQuestions.map(function(q, i){
+      var userAnswer = state.answers[i] || null;
+      var status = userAnswer ? (userAnswer === q.answer ? 'correct' : 'wrong') : 'blank';
+      return {
+        idx: i, num: q.num, topic: q.topic, difficulty: q.difficulty,
+        question: q.question, options: q.options, answer: q.answer, solution: q.solution,
+        userAnswer: userAnswer, marked: !!state.marked[i], status: status
+      };
+    });
+
+    var correct = records.filter(function(r){ return r.status === 'correct'; }).length;
+    var wrong = records.filter(function(r){ return r.status === 'wrong'; }).length;
+    var blank = records.filter(function(r){ return r.status === 'blank'; }).length;
+    var total = records.length;
+
+    var byDiff = {};
+    records.forEach(function(r){
+      byDiff[r.difficulty] = byDiff[r.difficulty] || { correct: 0, total: 0 };
+      byDiff[r.difficulty].total++;
+      if (r.status === 'correct') byDiff[r.difficulty].correct++;
+    });
+
+    var byTopic = {};
+    records.forEach(function(r){
+      byTopic[r.topic] = byTopic[r.topic] || { correct: 0, wrong: 0, total: 0 };
+      byTopic[r.topic].total++;
+      if (r.status === 'correct') byTopic[r.topic].correct++;
+      if (r.status === 'wrong') byTopic[r.topic].wrong++;
+    });
+
+    lastResults = {
+      records: records, correct: correct, wrong: wrong, blank: blank, total: total,
+      byDiff: byDiff, byTopic: byTopic,
+      elapsedSec: Math.round((state.finishedAt - state.startedAt) / 1000),
+      auto: !!auto
+    };
+
+    state.reviewFilter = 'all';
+    renderResults();
+    showScreen('results');
+  }
+
+  function scoreNote(pct){
+    if (pct >= 90) return 'An excellent handle on Unit I — sets, relations and functions are solid.';
+    if (pct >= 75) return 'A strong pass. A look at the flagged topics below will round it out.';
+    if (pct >= 50) return 'The foundations are there. Revisit the weaker topics below before the exam.';
+    return 'Early days with Unit I — work through the weakest topics first, then try again.';
+  }
+
+  function renderResults(){
+    var r = lastResults;
+    var pct = r.total ? Math.round((r.correct / r.total) * 100) : 0;
+
+    var html = '';
+    html += '<div class="score-block">';
+    html += '<div class="score-num">' + r.correct + '<span> / ' + r.total + '</span></div>';
+    html += '<p class="score-note">' + escapeHtml(scoreNote(pct)) + '</p>';
+    html += '<p class="score-sub">' + pct + '% correct' + (r.auto ? ' — time expired, submitted automatically' : '') +
+      (state.timed ? ' &nbsp;·&nbsp; finished in ' + fmtTime(r.elapsedSec) : '') + '</p>';
+    html += '</div>';
+
+    html += '<div class="numberline"><div class="numberline-track">' +
+      '<div class="numberline-fill" style="width:' + pct + '%"></div></div>' +
+      '<div class="numberline-labels"><span>0</span><span>' + Math.round(r.total/2) + '</span><span>' + r.total + '</span></div></div>';
+
+    html += '<h3 class="section-title">By difficulty</h3><div class="diff-rows">';
+    ['Easy','Moderate','Hard'].forEach(function(d){
+      var b = r.byDiff[d];
+      if (!b) return;
+      var p = b.total ? (b.correct / b.total) * 100 : 0;
+      html += '<div class="diff-row"><span>' + d + '</span>' +
+        '<div class="bar-track"><div class="bar-fill ' + d + '" style="width:' + p + '%"></div></div>' +
+        '<span class="frac">' + b.correct + '/' + b.total + '</span></div>';
+    });
+    html += '</div>';
+
+    var topicRows = Object.keys(r.byTopic).map(function(t){
+      var b = r.byTopic[t];
+      return { topic: t, correct: b.correct, wrong: b.wrong, total: b.total, pct: b.total ? b.correct / b.total : 0 };
+    }).sort(function(a, b2){ return a.pct - b2.pct; });
+
+    html += '<h3 class="section-title">By topic <span style="font-family:var(--mono); font-size:12px; font-weight:400; color:var(--ink-soft);">— weakest first</span></h3><div class="topic-rows">';
+    topicRows.forEach(function(tr){
+      var cPct = tr.total ? (tr.correct / tr.total) * 100 : 0;
+      var wPct = tr.total ? (tr.wrong / tr.total) * 100 : 0;
+      html += '<div class="topic-row"><span class="tname">' + escapeHtml(tr.topic) + '</span>' +
+        '<div class="stack-track"><div class="stack-correct" style="width:' + cPct + '%"></div>' +
+        '<div class="stack-wrong" style="width:' + wPct + '%"></div></div>' +
+        '<span class="frac">' + tr.correct + '/' + tr.total + '</span></div>';
+    });
+    html += '</div>';
+
+    html += '<h3 class="section-title">Review</h3>';
+    html += '<div class="filter-row">' +
+      ['all:All', 'wrong:Incorrect', 'correct:Correct', 'blank:Unattempted', 'marked:Marked'].map(function(f){
+        var parts = f.split(':');
+        return '<button type="button" class="filter-btn' + (state.reviewFilter === parts[0] ? ' active' : '') +
+          '" data-filter="' + parts[0] + '">' + parts[1] + '</button>';
+      }).join('') + '</div>';
+    html += '<div id="review-list"></div>';
+
+    html += '<div class="results-actions">' +
+      '<button type="button" class="btn btn-primary" id="btn-retry">Retry this test</button>' +
+      '<button type="button" class="btn btn-outline" id="btn-newtest">New test</button>' +
+      '<button type="button" class="btn btn-outline" id="btn-download">Download report</button>' +
+      '</div>';
+
+    $('results-content').innerHTML = html;
+
+    $('results-content').querySelectorAll('.filter-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        state.reviewFilter = btn.getAttribute('data-filter');
+        $('results-content').querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        renderReviewList();
+      });
+    });
+    renderReviewList();
+
+    $('btn-retry').addEventListener('click', function(){
+      beginTest(state.testQuestions.slice());
+    });
+    $('btn-newtest').addEventListener('click', function(){
+      showScreen('start');
+    });
+    $('btn-download').addEventListener('click', downloadReport);
+  }
+
+  function renderReviewList(){
+    var r = lastResults;
+    var filter = state.reviewFilter;
+    var list = r.records.filter(function(rec){
+      if (filter === 'all') return true;
+      if (filter === 'marked') return rec.marked;
+      return rec.status === filter;
+    });
+
+    var wrap = $('review-list');
+    if (!list.length) {
+      wrap.innerHTML = '<p style="font-size:13px; color:var(--ink-soft); padding:16px 4px;">Nothing matches this filter.</p>';
+      return;
+    }
+
+    wrap.innerHTML = list.map(function(rec, k){
+      var dotClass = rec.status === 'correct' ? 'correct' : (rec.status === 'wrong' ? 'wrong' : 'blank');
+      var optsHtml = LETTERS.map(function(letter){
+        if (!(letter in rec.options)) return '';
+        var cls = 'review-opt';
+        var tag = '';
+        if (letter === rec.answer) { cls += ' correct-ans'; tag = 'correct'; }
+        if (letter === rec.userAnswer && rec.userAnswer !== rec.answer) { cls += ' your-wrong'; tag = 'your answer'; }
+        return '<div class="' + cls + '"><span>' + letter + '.</span><span style="flex:1;">' + escapeHtml(rec.options[letter]) + '</span>' +
+          (tag ? '<span class="tag">' + tag + '</span>' : '') + '</div>';
+      }).join('');
+
+      return '<div class="review-item" data-k="' + k + '">' +
+        '<button type="button" class="review-head">' +
+        '<span class="status-dot ' + dotClass + '"></span>' +
+        '<span class="review-head-body">' +
+        '<span class="review-head-meta"><span class="chip">Q' + rec.num + '</span><span class="chip">' + escapeHtml(rec.topic) + '</span><span class="chip chip-diff" data-d="' + rec.difficulty + '">' + rec.difficulty + '</span></span>' +
+        '<span class="review-head-q">' + escapeHtml(rec.question) + '</span>' +
+        '</span>' +
+        '<span class="review-caret">&#8250;</span>' +
+        '</button>' +
+        '<div class="review-body">' +
+        '<div class="review-options">' + optsHtml + '</div>' +
+        '<p class="review-solution"><b>Solution: </b>' + escapeHtml(rec.solution) + '</p>' +
+        '</div></div>';
+    }).join('');
+
+    wrap.querySelectorAll('.review-head').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        btn.parentElement.classList.toggle('open');
+      });
+    });
+  }
+
+  /* ---------------- 3D Venn hero (Three.js, progressive enhancement) ---------------- */
+  function initVennHero(){
+    var container = $('venn3d');
+    if (!container || typeof THREE === 'undefined') return false;
+    try {
+      var w = container.clientWidth, h = container.clientHeight;
+      if (!w || !h) return false;
+
+      var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(w, h);
+      container.appendChild(renderer.domElement);
+
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(38, w / h, 0.1, 100);
+      camera.position.set(0, 0, 7);
+
+      var group = new THREE.Group();
+      scene.add(group);
+
+      var geo = new THREE.SphereGeometry(1.55, 48, 48);
+      var matA = new THREE.MeshPhongMaterial({ color: 0x2C4A9E, transparent: true, opacity: 0.72, shininess: 60 });
+      var matB = new THREE.MeshPhongMaterial({ color: 0xC1443D, transparent: true, opacity: 0.72, shininess: 60 });
+      var sphereA = new THREE.Mesh(geo, matA);
+      var sphereB = new THREE.Mesh(geo, matB);
+      sphereA.position.x = -0.95;
+      sphereB.position.x = 0.95;
+      group.add(sphereA, sphereB);
+
+      scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+      var dir1 = new THREE.DirectionalLight(0xffffff, 0.9);
+      dir1.position.set(3, 4, 5);
+      scene.add(dir1);
+      var dir2 = new THREE.DirectionalLight(0xffffff, 0.35);
+      dir2.position.set(-4, -2, -3);
+      scene.add(dir2);
+
+      var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      var dragging = false, lastX = 0, lastY = 0, velX = 0, velY = 0;
+      function pos(e){ return e.touches ? e.touches[0] : e; }
+      function onDown(e){ dragging = true; var p = pos(e); lastX = p.clientX; lastY = p.clientY; container.style.cursor = 'grabbing'; }
+      function onMove(e){
+        if (!dragging) return;
+        var p = pos(e);
+        velY = (p.clientX - lastX) * 0.006;
+        velX = (p.clientY - lastY) * 0.006;
+        group.rotation.y += velY;
+        group.rotation.x += velX;
+        lastX = p.clientX; lastY = p.clientY;
+      }
+      function onUp(){ dragging = false; container.style.cursor = 'grab'; }
+
+      renderer.domElement.addEventListener('pointerdown', onDown);
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
+      renderer.domElement.addEventListener('touchstart', onDown, { passive: true });
+      window.addEventListener('touchmove', onMove, { passive: true });
+      window.addEventListener('touchend', onUp);
+
+      window.addEventListener('resize', function(){
+        var w2 = container.clientWidth, h2 = container.clientHeight;
+        if (!w2 || !h2) return;
+        camera.aspect = w2 / h2;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w2, h2);
+      });
+
+      var clock = new THREE.Clock();
+      function animate(){
+        requestAnimationFrame(animate);
+        var dt = Math.min(clock.getDelta(), 0.05);
+        if (!dragging) {
+          if (!reducedMotion) group.rotation.y += dt * 0.18;
+          velX *= 0.94; velY *= 0.94;
+          group.rotation.x += velX * 0.4;
+          group.rotation.y += velY * 0.4;
+        }
+        renderer.render(scene, camera);
+      }
+      animate();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /* ---------------- keyboard shortcuts ---------------- */
+  document.addEventListener('keydown', function(e){
+    if (!$('modal-backdrop').hidden) {
+      if (e.key === 'Escape') $('modal-cancel').click();
+      if (e.key === 'Enter') $('modal-confirm').click();
+      return;
+    }
+    if ($('screen-test').hidden) return;
+    var key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (key === 'ArrowRight' || key === 'n') { $('btn-next').click(); }
+    else if (key === 'ArrowLeft' || key === 'p') { $('btn-prev').click(); }
+    else if (key === 'm') { $('btn-mark').click(); }
+    else if (['1', '2', '3', '4'].indexOf(key) !== -1) {
+      var letter = LETTERS[parseInt(key, 10) - 1];
+      var btn = document.querySelector('#options .option[data-letter="' + letter + '"]');
+      if (btn && !btn.disabled) btn.click();
+    } else if (['a', 'b', 'c', 'd'].indexOf(key) !== -1) {
+      var letter2 = key.toUpperCase();
+      var btn2 = document.querySelector('#options .option[data-letter="' + letter2 + '"]');
+      if (btn2 && !btn2.disabled) btn2.click();
+    }
+  });
+
+  /* ---------------- downloadable report ---------------- */
+  function buildReportText(r){
+    var lines = [];
+    lines.push('Sets, Relations & Functions - Unit I Mock Test Report');
+    lines.push('Score: ' + r.correct + ' / ' + r.total + ' (' + Math.round((r.correct / r.total) * 100) + '%)');
+    if (state.timed) lines.push('Time taken: ' + fmtTime(r.elapsedSec));
+    lines.push('');
+    lines.push('By difficulty');
+    ['Easy', 'Moderate', 'Hard'].forEach(function(d){
+      var b = r.byDiff[d];
+      if (!b) return;
+      lines.push('  ' + d + ': ' + b.correct + '/' + b.total);
+    });
+    lines.push('');
+    lines.push('By topic');
+    Object.keys(r.byTopic).forEach(function(t){
+      var b = r.byTopic[t];
+      lines.push('  ' + t + ': ' + b.correct + '/' + b.total);
+    });
+    lines.push('');
+    lines.push('Question detail');
+    r.records.forEach(function(rec){
+      lines.push('');
+      lines.push('Q' + rec.num + ' [' + rec.topic + ' / ' + rec.difficulty + '] - ' + rec.status.toUpperCase());
+      lines.push(rec.question);
+      lines.push('Your answer: ' + (rec.userAnswer || '(blank)') + '   Correct answer: ' + rec.answer);
+      lines.push('Solution: ' + rec.solution);
+    });
+    return lines.join('\n');
+  }
+
+  function downloadReport(){
+    if (!lastResults) return;
+    var text = buildReportText(lastResults);
+    var blob = new Blob([text], { type: 'text/plain' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'unit1-mock-test-report.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }
+
+  /* ---------------- init ---------------- */
+  renderStartScreen();
+  showScreen('start');
+
+  if (initVennHero()) {
+    $('venn-fallback').style.display = 'none';
+    $('venn3d').style.display = 'block';
+    $('venn-hint').hidden = false;
+  }
+})();
