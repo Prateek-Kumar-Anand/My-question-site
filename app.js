@@ -2,19 +2,50 @@
   "use strict";
 
   var QUESTIONS = JSON.parse(document.getElementById('qdata').textContent);
-  var TOPICS = [];
-  QUESTIONS.forEach(function(q){ if (TOPICS.indexOf(q.topic) === -1) TOPICS.push(q.topic); });
-
   var LETTERS = ['A','B','C','D'];
 
+  var TOPICS_BY_UNIT = {};
+  QUESTIONS.forEach(function(q){
+    TOPICS_BY_UNIT[q.unit] = TOPICS_BY_UNIT[q.unit] || [];
+    if (TOPICS_BY_UNIT[q.unit].indexOf(q.topic) === -1) TOPICS_BY_UNIT[q.unit].push(q.topic);
+  });
+
+  var UNIT_META = {
+    1: {
+      wordmark: 'Unit I \u2014 Mathematical Foundation for AI',
+      headline: 'Sets, Relations & Functions',
+      subhead: 'A mock test built from your own Unit I question bank, with a detailed solution behind every question.',
+      fullTitle: 'Full mock test',
+      fullDesc: function(n){ return 'All ' + n + ' questions, every topic, in order.'; },
+      quickDesc: '20 random questions across the unit.',
+      hasFeedbackToggle: true,
+      reportTitle: 'Sets, Relations & Functions \u2014 Unit I Mock Test Report'
+    },
+    2: {
+      wordmark: 'Unit II \u2014 Counting & Recurrence',
+      headline: 'Counting & Recurrence',
+      subhead: 'Flashcard-style practice built from your Counting & Recurrence bank \u2014 reveal each answer, then grade yourself.',
+      fullTitle: 'Full practice set',
+      fullDesc: function(n){ return 'All ' + n + ' questions, every topic, in order.'; },
+      quickDesc: '20 random questions across the unit.',
+      hasFeedbackToggle: false,
+      reportTitle: 'Counting & Recurrence \u2014 Unit II Practice Report'
+    }
+  };
+
   var state = {
+    unit: 1,
     feedbackMode: 'exam',
     testQuestions: [],
     answers: {},
     marked: {},
+    revealed: {},
     current: 0,
+    kind: 'mcq',
     timed: false,
+    countMode: 'down',
     remainingSec: 0,
+    elapsedSec: 0,
     timerId: null,
     startedAt: null,
     finishedAt: null,
@@ -42,6 +73,9 @@
     var m = Math.floor(sec / 60), s = sec % 60;
     return pad2(m) + ':' + pad2(s);
   }
+  function poolForUnit(unit){
+    return QUESTIONS.filter(function(q){ return q.unit === unit; });
+  }
 
   /* ---------------- screen switching ---------------- */
   function showScreen(name){
@@ -54,9 +88,32 @@
   }
 
   /* ---------------- START SCREEN ---------------- */
-  function renderStartScreen(){
+  function applyUnitUI(unit){
+    state.unit = unit;
+    state.selectedTopics = {};
+    var meta = UNIT_META[unit];
+    var pool = poolForUnit(unit);
+    var topics = TOPICS_BY_UNIT[unit] || [];
+
+    $('wordmark-text').textContent = meta.wordmark;
+    $('headline').textContent = meta.headline;
+    $('subhead').textContent = meta.subhead;
+    $('stat-questions').textContent = pool.length;
+    $('stat-topics').textContent = topics.length;
+    $('full-title').textContent = meta.fullTitle;
+    $('full-desc').textContent = meta.fullDesc(pool.length);
+    $('quick-desc').textContent = meta.quickDesc;
+
+    $('feedback-toggle').hidden = !meta.hasFeedbackToggle;
+    $('feedback-hint').hidden = !meta.hasFeedbackToggle;
+    if (meta.hasFeedbackToggle) {
+      document.querySelectorAll('.mode-toggle-btn').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelector('.mode-toggle-btn[data-feedback="exam"]').classList.add('active');
+      state.feedbackMode = 'exam';
+    }
+
     var chipsWrap = $('topic-chips');
-    chipsWrap.innerHTML = TOPICS.map(function(t){
+    chipsWrap.innerHTML = topics.map(function(t){
       return '<button type="button" class="topic-chip" data-topic="' + escapeHtml(t) + '">' + escapeHtml(t) + '</button>';
     }).join('');
     chipsWrap.querySelectorAll('.topic-chip').forEach(function(btn){
@@ -64,24 +121,32 @@
         var t = btn.getAttribute('data-topic');
         if (state.selectedTopics[t]) { delete state.selectedTopics[t]; btn.classList.remove('selected'); }
         else { state.selectedTopics[t] = true; btn.classList.add('selected'); }
-        var n = Object.keys(state.selectedTopics).length;
+        var chosen = Object.keys(state.selectedTopics);
+        var count = pool.filter(function(q){ return chosen.indexOf(q.topic) !== -1; }).length;
         var startBtn = $('start-topic');
-        startBtn.disabled = n === 0;
-        startBtn.textContent = n === 0 ? 'Select topics to start' :
-          ('Start practice — ' + (n * 4) + ' question' + (n * 4 === 1 ? '' : 's'));
+        startBtn.disabled = chosen.length === 0;
+        startBtn.textContent = chosen.length === 0 ? 'Select topics to start' :
+          ('Start practice \u2014 ' + count + ' question' + (count === 1 ? '' : 's'));
       });
     });
 
     var cov = $('coverage-list');
-    cov.innerHTML = TOPICS.map(function(t){
-      var count = QUESTIONS.filter(function(q){ return q.topic === t; }).length;
+    cov.innerHTML = topics.map(function(t){
+      var count = pool.filter(function(q){ return q.topic === t; }).length;
       return '<li><span>' + escapeHtml(t) + '</span><span>' + count + ' question' + (count === 1 ? '' : 's') + '</span></li>';
     }).join('');
+    $('coverage-summary').textContent = 'Full topic coverage (' + topics.length + ' topics, ' + pool.length + ' questions total)';
 
     updateModeMeta();
   }
 
   function updateModeMeta(){
+    var meta = UNIT_META[state.unit];
+    if (!meta.hasFeedbackToggle) {
+      $('full-meta').textContent = 'Self-paced, untimed';
+      $('quick-meta').textContent = 'Self-paced, untimed';
+      return;
+    }
     var timed = state.feedbackMode === 'exam';
     $('full-meta').textContent = timed ? '100 min, timed' : 'Untimed, instant feedback';
     $('quick-meta').textContent = timed ? '20 min, timed' : 'Untimed, instant feedback';
@@ -89,6 +154,14 @@
       ? 'Answers are hidden until you submit, with a countdown timer.'
       : 'See the correct answer and solution right after each question, no clock.';
   }
+
+  document.querySelectorAll('.unit-toggle-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.unit-toggle-btn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      applyUnitUI(parseInt(btn.getAttribute('data-unit'), 10));
+    });
+  });
 
   document.querySelectorAll('.mode-toggle-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
@@ -100,15 +173,15 @@
   });
 
   $('start-full').addEventListener('click', function(){
-    beginTest(QUESTIONS.slice());
+    beginTest(poolForUnit(state.unit));
   });
   $('start-quick').addEventListener('click', function(){
-    beginTest(shuffle(QUESTIONS).slice(0, 20));
+    beginTest(shuffle(poolForUnit(state.unit)).slice(0, 20));
   });
   $('start-topic').addEventListener('click', function(){
     var topics = Object.keys(state.selectedTopics);
     if (!topics.length) return;
-    beginTest(QUESTIONS.filter(function(q){ return topics.indexOf(q.topic) !== -1; }));
+    beginTest(poolForUnit(state.unit).filter(function(q){ return topics.indexOf(q.topic) !== -1; }));
   });
 
   /* ---------------- TEST SCREEN ---------------- */
@@ -116,37 +189,58 @@
     state.testQuestions = questions;
     state.answers = {};
     state.marked = {};
+    state.revealed = {};
     state.current = 0;
-    state.timed = state.feedbackMode === 'exam';
-    state.remainingSec = questions.length * 60;
+    state.kind = questions.length && questions[0].kind === 'flashcard' ? 'flashcard' : 'mcq';
     state.startedAt = Date.now();
     state.finishedAt = null;
     clearInterval(state.timerId);
 
     buildJumpStrip();
     showScreen('test');
-    renderQuestion(0);
 
-    if (state.timed) {
+    if (state.kind === 'flashcard') {
+      state.timed = false;
+      state.countMode = 'up';
+      state.elapsedSec = 0;
       $('timer').hidden = false;
       updateTimerDisplay();
       state.timerId = setInterval(function(){
-        state.remainingSec--;
+        state.elapsedSec++;
         updateTimerDisplay();
-        if (state.remainingSec <= 0) {
-          clearInterval(state.timerId);
-          submitTest(true);
-        }
       }, 1000);
     } else {
-      $('timer').hidden = true;
+      state.timed = state.feedbackMode === 'exam';
+      state.countMode = 'down';
+      state.remainingSec = questions.length * 60;
+      if (state.timed) {
+        $('timer').hidden = false;
+        updateTimerDisplay();
+        state.timerId = setInterval(function(){
+          state.remainingSec--;
+          updateTimerDisplay();
+          if (state.remainingSec <= 0) {
+            clearInterval(state.timerId);
+            submitTest(true);
+          }
+        }, 1000);
+      } else {
+        $('timer').hidden = true;
+      }
     }
+
+    renderQuestion(0);
   }
 
   function updateTimerDisplay(){
     var el = $('timer');
-    el.textContent = fmtTime(state.remainingSec);
-    el.classList.toggle('timer--low', state.remainingSec <= 60);
+    if (state.countMode === 'up') {
+      el.textContent = fmtTime(state.elapsedSec);
+      el.classList.remove('timer--low');
+    } else {
+      el.textContent = fmtTime(state.remainingSec);
+      el.classList.toggle('timer--low', state.remainingSec <= 60);
+    }
   }
 
   function buildJumpStrip(){
@@ -185,6 +279,24 @@
 
     $('q-stem').textContent = q.question;
 
+    if (q.kind === 'mcq') {
+      renderMcq(i, q);
+    } else {
+      renderFlashcard(i, q);
+    }
+
+    var markBtn = $('btn-mark');
+    markBtn.textContent = state.marked[i] ? 'Marked for review' : 'Mark for review';
+    markBtn.classList.toggle('is-marked', !!state.marked[i]);
+
+    $('btn-prev').disabled = i === 0;
+    $('btn-next').textContent = (i === total - 1) ? 'Finish' : 'Next';
+
+    refreshJumpStrip();
+  }
+
+  function renderMcq(i, q){
+    $('grade-row').hidden = true;
     var userAns = state.answers[i];
     var revealed = userAns && state.feedbackMode === 'practice';
 
@@ -215,27 +327,52 @@
       var isCorrect = userAns === q.answer;
       panel.hidden = false;
       panel.className = 'feedback-panel ' + (isCorrect ? 'is-correct' : 'is-wrong');
-      panel.innerHTML = '<b>' + (isCorrect ? 'Correct.' : 'Not quite — correct answer is ' + q.answer + '.') + '</b> ' +
+      panel.innerHTML = '<b>' + (isCorrect ? 'Correct.' : 'Not quite \u2014 correct answer is ' + q.answer + '.') + '</b> ' +
         escapeHtml(q.solution);
     } else {
       panel.hidden = true;
       panel.innerHTML = '';
     }
-
-    var markBtn = $('btn-mark');
-    markBtn.textContent = state.marked[i] ? 'Marked for review' : 'Mark for review';
-    markBtn.classList.toggle('is-marked', !!state.marked[i]);
-
-    $('btn-prev').disabled = i === 0;
-    var nextBtn = $('btn-next');
-    if (i === total - 1) {
-      nextBtn.textContent = 'Finish';
-    } else {
-      nextBtn.textContent = 'Next';
-    }
-
-    refreshJumpStrip();
   }
+
+  function renderFlashcard(i, q){
+    var revealed = !!state.revealed[i];
+    var panel = $('feedback-panel');
+    var gradeRow = $('grade-row');
+
+    if (!revealed) {
+      $('options').innerHTML = '<button type="button" class="reveal-btn" id="btn-reveal">Reveal answer</button>';
+      $('btn-reveal').addEventListener('click', function(){ revealCard(i); });
+      panel.hidden = true;
+      panel.innerHTML = '';
+      gradeRow.hidden = true;
+    } else {
+      $('options').innerHTML = '';
+      panel.hidden = false;
+      panel.className = 'feedback-panel';
+      panel.innerHTML = '<b>Answer.</b> ' + escapeHtml(q.solution);
+      gradeRow.hidden = false;
+      var grade = state.answers[i];
+      document.querySelector('.grade-right').classList.toggle('selected', grade === 'correct');
+      document.querySelector('.grade-wrong').classList.toggle('selected', grade === 'wrong');
+    }
+  }
+
+  function revealCard(i){
+    state.revealed[i] = true;
+    renderQuestion(i);
+  }
+
+  function gradeCard(i, grade){
+    state.answers[i] = grade;
+    renderQuestion(i);
+  }
+
+  $('grade-row').addEventListener('click', function(e){
+    var btn = e.target.closest ? e.target.closest('.grade-btn') : null;
+    if (!btn) return;
+    gradeCard(state.current, btn.getAttribute('data-grade'));
+  });
 
   function selectOption(i, letter){
     if (state.feedbackMode === 'practice' && state.answers[i]) return; // locked after reveal
@@ -306,9 +443,14 @@
     state.finishedAt = Date.now();
     var records = state.testQuestions.map(function(q, i){
       var userAnswer = state.answers[i] || null;
-      var status = userAnswer ? (userAnswer === q.answer ? 'correct' : 'wrong') : 'blank';
+      var status;
+      if (q.kind === 'flashcard') {
+        status = userAnswer ? userAnswer : 'blank';
+      } else {
+        status = userAnswer ? (userAnswer === q.answer ? 'correct' : 'wrong') : 'blank';
+      }
       return {
-        idx: i, num: q.num, topic: q.topic, difficulty: q.difficulty,
+        idx: i, num: q.num, topic: q.topic, difficulty: q.difficulty, kind: q.kind,
         question: q.question, options: q.options, answer: q.answer, solution: q.solution,
         userAnswer: userAnswer, marked: !!state.marked[i], status: status
       };
@@ -334,11 +476,14 @@
       if (r.status === 'wrong') byTopic[r.topic].wrong++;
     });
 
+    var elapsed = state.countMode === 'up' ? state.elapsedSec : Math.round((state.finishedAt - state.startedAt) / 1000);
+
     lastResults = {
       records: records, correct: correct, wrong: wrong, blank: blank, total: total,
       byDiff: byDiff, byTopic: byTopic,
-      elapsedSec: Math.round((state.finishedAt - state.startedAt) / 1000),
-      auto: !!auto
+      elapsedSec: elapsed,
+      auto: !!auto,
+      unit: state.testQuestions.length ? state.testQuestions[0].unit : state.unit
     };
 
     state.reviewFilter = 'all';
@@ -347,22 +492,23 @@
   }
 
   function scoreNote(pct){
-    if (pct >= 90) return 'An excellent handle on Unit I — sets, relations and functions are solid.';
+    if (pct >= 90) return 'An excellent handle on this material \u2014 the fundamentals are solid.';
     if (pct >= 75) return 'A strong pass. A look at the flagged topics below will round it out.';
     if (pct >= 50) return 'The foundations are there. Revisit the weaker topics below before the exam.';
-    return 'Early days with Unit I — work through the weakest topics first, then try again.';
+    return 'Early days with this unit \u2014 work through the weakest topics first, then try again.';
   }
 
   function renderResults(){
     var r = lastResults;
     var pct = r.total ? Math.round((r.correct / r.total) * 100) : 0;
+    var showTime = state.timed || state.countMode === 'up';
 
     var html = '';
     html += '<div class="score-block">';
     html += '<div class="score-num">' + r.correct + '<span> / ' + r.total + '</span></div>';
     html += '<p class="score-note">' + escapeHtml(scoreNote(pct)) + '</p>';
-    html += '<p class="score-sub">' + pct + '% correct' + (r.auto ? ' — time expired, submitted automatically' : '') +
-      (state.timed ? ' &nbsp;·&nbsp; finished in ' + fmtTime(r.elapsedSec) : '') + '</p>';
+    html += '<p class="score-sub">' + pct + '% correct' + (r.auto ? ' \u2014 time expired, submitted automatically' : '') +
+      (showTime ? ' &nbsp;\u00b7&nbsp; finished in ' + fmtTime(r.elapsedSec) : '') + '</p>';
     html += '</div>';
 
     html += '<div class="numberline"><div class="numberline-track">' +
@@ -385,7 +531,7 @@
       return { topic: t, correct: b.correct, wrong: b.wrong, total: b.total, pct: b.total ? b.correct / b.total : 0 };
     }).sort(function(a, b2){ return a.pct - b2.pct; });
 
-    html += '<h3 class="section-title">By topic <span style="font-family:var(--mono); font-size:12px; font-weight:400; color:var(--ink-soft);">— weakest first</span></h3><div class="topic-rows">';
+    html += '<h3 class="section-title">By topic <span style="font-family:var(--mono); font-size:12px; font-weight:400; color:var(--ink-soft);">\u2014 weakest first</span></h3><div class="topic-rows">';
     topicRows.forEach(function(tr){
       var cPct = tr.total ? (tr.correct / tr.total) * 100 : 0;
       var wPct = tr.total ? (tr.wrong / tr.total) * 100 : 0;
@@ -449,15 +595,24 @@
 
     wrap.innerHTML = list.map(function(rec, k){
       var dotClass = rec.status === 'correct' ? 'correct' : (rec.status === 'wrong' ? 'wrong' : 'blank');
-      var optsHtml = LETTERS.map(function(letter){
-        if (!(letter in rec.options)) return '';
-        var cls = 'review-opt';
-        var tag = '';
-        if (letter === rec.answer) { cls += ' correct-ans'; tag = 'correct'; }
-        if (letter === rec.userAnswer && rec.userAnswer !== rec.answer) { cls += ' your-wrong'; tag = 'your answer'; }
-        return '<div class="' + cls + '"><span>' + letter + '.</span><span style="flex:1;">' + escapeHtml(rec.options[letter]) + '</span>' +
-          (tag ? '<span class="tag">' + tag + '</span>' : '') + '</div>';
-      }).join('');
+      var bodyHtml;
+      if (rec.kind === 'mcq') {
+        var optsHtml = LETTERS.map(function(letter){
+          if (!(letter in rec.options)) return '';
+          var cls = 'review-opt';
+          var tag = '';
+          if (letter === rec.answer) { cls += ' correct-ans'; tag = 'correct'; }
+          if (letter === rec.userAnswer && rec.userAnswer !== rec.answer) { cls += ' your-wrong'; tag = 'your answer'; }
+          return '<div class="' + cls + '"><span>' + letter + '.</span><span style="flex:1;">' + escapeHtml(rec.options[letter]) + '</span>' +
+            (tag ? '<span class="tag">' + tag + '</span>' : '') + '</div>';
+        }).join('');
+        bodyHtml = '<div class="review-options">' + optsHtml + '</div>' +
+          '<p class="review-solution"><b>Solution: </b>' + escapeHtml(rec.solution) + '</p>';
+      } else {
+        var gradeLabel = rec.status === 'correct' ? 'Self-graded correct' :
+          (rec.status === 'wrong' ? 'Self-graded \u2014 needs review' : 'Not attempted');
+        bodyHtml = '<p class="review-solution"><b>' + gradeLabel + '.</b> ' + escapeHtml(rec.solution) + '</p>';
+      }
 
       return '<div class="review-item" data-k="' + k + '">' +
         '<button type="button" class="review-head">' +
@@ -468,10 +623,7 @@
         '</span>' +
         '<span class="review-caret">&#8250;</span>' +
         '</button>' +
-        '<div class="review-body">' +
-        '<div class="review-options">' + optsHtml + '</div>' +
-        '<p class="review-solution"><b>Solution: </b>' + escapeHtml(rec.solution) + '</p>' +
-        '</div></div>';
+        '<div class="review-body">' + bodyHtml + '</div></div>';
     }).join('');
 
     wrap.querySelectorAll('.review-head').forEach(function(btn){
@@ -576,11 +728,26 @@
       return;
     }
     if ($('screen-test').hidden) return;
+    var q = state.testQuestions[state.current];
     var key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-    if (key === 'ArrowRight' || key === 'n') { $('btn-next').click(); }
-    else if (key === 'ArrowLeft' || key === 'p') { $('btn-prev').click(); }
-    else if (key === 'm') { $('btn-mark').click(); }
-    else if (['1', '2', '3', '4'].indexOf(key) !== -1) {
+
+    if (key === 'ArrowRight' || key === 'n') { $('btn-next').click(); return; }
+    if (key === 'ArrowLeft' || key === 'p') { $('btn-prev').click(); return; }
+    if (key === 'm') { $('btn-mark').click(); return; }
+
+    if (q && q.kind === 'flashcard') {
+      if (key === 'Enter' || key === 'r') {
+        var revealBtn = $('btn-reveal');
+        if (revealBtn) revealBtn.click();
+      } else if (key === '1') {
+        if (!$('grade-row').hidden) document.querySelector('.grade-right').click();
+      } else if (key === '2') {
+        if (!$('grade-row').hidden) document.querySelector('.grade-wrong').click();
+      }
+      return;
+    }
+
+    if (['1', '2', '3', '4'].indexOf(key) !== -1) {
       var letter = LETTERS[parseInt(key, 10) - 1];
       var btn = document.querySelector('#options .option[data-letter="' + letter + '"]');
       if (btn && !btn.disabled) btn.click();
@@ -593,10 +760,11 @@
 
   /* ---------------- downloadable report ---------------- */
   function buildReportText(r){
+    var meta = UNIT_META[r.unit] || UNIT_META[1];
     var lines = [];
-    lines.push('Sets, Relations & Functions - Unit I Mock Test Report');
+    lines.push(meta.reportTitle);
     lines.push('Score: ' + r.correct + ' / ' + r.total + ' (' + Math.round((r.correct / r.total) * 100) + '%)');
-    if (state.timed) lines.push('Time taken: ' + fmtTime(r.elapsedSec));
+    lines.push('Time taken: ' + fmtTime(r.elapsedSec));
     lines.push('');
     lines.push('By difficulty');
     ['Easy', 'Moderate', 'Hard'].forEach(function(d){
@@ -616,7 +784,11 @@
       lines.push('');
       lines.push('Q' + rec.num + ' [' + rec.topic + ' / ' + rec.difficulty + '] - ' + rec.status.toUpperCase());
       lines.push(rec.question);
-      lines.push('Your answer: ' + (rec.userAnswer || '(blank)') + '   Correct answer: ' + rec.answer);
+      if (rec.kind === 'mcq') {
+        lines.push('Your answer: ' + (rec.userAnswer || '(blank)') + '   Correct answer: ' + rec.answer);
+      } else {
+        lines.push('Self-graded: ' + (rec.userAnswer || '(not attempted)'));
+      }
       lines.push('Solution: ' + rec.solution);
     });
     return lines.join('\n');
@@ -629,7 +801,7 @@
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
-    a.download = 'unit1-mock-test-report.txt';
+    a.download = 'unit' + lastResults.unit + '-mock-test-report.txt';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -637,7 +809,7 @@
   }
 
   /* ---------------- init ---------------- */
-  renderStartScreen();
+  applyUnitUI(1);
   showScreen('start');
 
   if (initVennHero()) {

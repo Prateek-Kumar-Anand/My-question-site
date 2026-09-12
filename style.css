@@ -153,6 +153,16 @@ main{ flex:1; width:100%; }
 .mode-toggle-btn.active{ background:var(--ink); color:var(--paper); }
 .mode-toggle-hint{ font-size:13px; color:var(--ink-soft); margin-top:10px; }
 
+.unit-toggle{
+  display:inline-flex; border:1px solid var(--line); border-radius:999px; padding:3px;
+  background:var(--surface); margin-bottom:26px;
+}
+.unit-toggle-btn{
+  background:none; border:none; border-radius:999px; padding:8px 18px;
+  font-family:var(--mono); font-size:13px; font-weight:500; color:var(--ink-soft); cursor:pointer;
+}
+.unit-toggle-btn.active{ background:var(--set-a); color:#fff; }
+
 .mode-cards{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:22px; }
 .mode-card{
   text-align:left; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m);
@@ -221,6 +231,22 @@ main{ flex:1; width:100%; }
 .feedback-panel.is-correct{ border-left-color:var(--correct); }
 .feedback-panel.is-wrong{ border-left-color:var(--set-b); }
 .feedback-panel b{ color:var(--ink); font-weight:600; }
+
+.reveal-btn{
+  margin-top:26px; width:100%; text-align:center; padding:18px;
+  background:var(--surface); border:1px dashed var(--line); border-radius:var(--radius-m);
+  font-family:var(--mono); font-size:14px; font-weight:500; color:var(--ink-soft); cursor:pointer;
+}
+.reveal-btn:hover{ border-color:var(--set-a); color:var(--set-a); }
+
+.grade-row{ display:flex; gap:12px; margin-top:16px; }
+.grade-btn{
+  flex:1; padding:13px; border-radius:var(--radius-s); font-family:var(--mono); font-size:13.5px; font-weight:500;
+  cursor:pointer; border:1px solid var(--line); background:var(--surface); color:var(--ink-soft);
+}
+.grade-btn:hover{ border-color:var(--ink-soft); }
+.grade-right.selected{ background:var(--correct-tint); border-color:var(--correct); color:#245f40; }
+.grade-wrong.selected{ background:var(--set-b-tint); border-color:var(--set-b); color:#9a352f; }
 
 .test-actions{ display:flex; align-items:center; justify-content:space-between; margin-top:28px; }
 .nav-buttons{ display:flex; gap:10px; }
