@@ -5,7 +5,9 @@
    scoring — instead of a single generic accent.
    ===================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+/* Fonts: system/local fallback stack only (see --serif/--mono below) —
+   intentionally no external @import, so the page makes no third-party
+   network request and keeps working fully offline. */
 
 :root{
   --ink:        #1B2230;
@@ -25,8 +27,8 @@
 
   --radius-s: 4px;
   --radius-m: 8px;
-  --serif: 'Newsreader', 'Iowan Old Style', Georgia, serif;
-  --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --serif: 'Iowan Old Style', Georgia, serif;
+  --mono: ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
   --maxw: 760px;
 }
@@ -232,22 +234,6 @@ main{ flex:1; width:100%; }
 .feedback-panel.is-wrong{ border-left-color:var(--set-b); }
 .feedback-panel b{ color:var(--ink); font-weight:600; }
 
-.reveal-btn{
-  margin-top:26px; width:100%; text-align:center; padding:18px;
-  background:var(--surface); border:1px dashed var(--line); border-radius:var(--radius-m);
-  font-family:var(--mono); font-size:14px; font-weight:500; color:var(--ink-soft); cursor:pointer;
-}
-.reveal-btn:hover{ border-color:var(--set-a); color:var(--set-a); }
-
-.grade-row{ display:flex; gap:12px; margin-top:16px; }
-.grade-btn{
-  flex:1; padding:13px; border-radius:var(--radius-s); font-family:var(--mono); font-size:13.5px; font-weight:500;
-  cursor:pointer; border:1px solid var(--line); background:var(--surface); color:var(--ink-soft);
-}
-.grade-btn:hover{ border-color:var(--ink-soft); }
-.grade-right.selected{ background:var(--correct-tint); border-color:var(--correct); color:#245f40; }
-.grade-wrong.selected{ background:var(--set-b-tint); border-color:var(--set-b); color:#9a352f; }
-
 .test-actions{ display:flex; align-items:center; justify-content:space-between; margin-top:28px; }
 .nav-buttons{ display:flex; gap:10px; }
 
@@ -280,6 +266,9 @@ main{ flex:1; width:100%; }
 .numberline-labels{ display:flex; justify-content:space-between; font-size:11px; color:var(--ink-soft); margin-top:6px; }
 
 .section-title{ font-family:var(--serif); font-size:18px; font-weight:600; margin:34px 0 14px; }
+.subtle-note{ font-family:var(--mono); font-size:12px; font-weight:400; color:var(--ink-soft); }
+.review-empty{ font-size:13px; color:var(--ink-soft); padding:16px 4px; }
+.review-opt-text{ flex:1; }
 
 .diff-rows{ display:flex; flex-direction:column; gap:12px; }
 .diff-row{ display:grid; grid-template-columns:90px 1fr 56px; align-items:center; gap:12px; font-size:13px; }
