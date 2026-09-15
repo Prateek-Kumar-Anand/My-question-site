@@ -1,15 +1,65 @@
 (function(){
   "use strict";
 
+  /**
+   * One multiple-choice question, as stored in questions.js.
+   * @typedef {Object} Question
+   * @property {number} num
+   * @property {string} topic
+   * @property {("Easy"|"Moderate"|"Hard")} difficulty
+   * @property {string} question
+   * @property {Object.<string,string>} options
+   * @property {string} answer
+   * @property {string} solution
+   * @property {number} unit
+   * @property {string} kind
+   */
+
+  /**
+   * One graded question, built by submitTest() for the results/review screens.
+   * @typedef {Object} ReviewRecord
+   * @property {number} idx
+   * @property {number} num
+   * @property {string} topic
+   * @property {("Easy"|"Moderate"|"Hard")} difficulty
+   * @property {string} question
+   * @property {Object.<string,string>} options
+   * @property {string} answer
+   * @property {string} solution
+   * @property {?string} userAnswer
+   * @property {boolean} marked
+   * @property {("correct"|"wrong"|"blank")} status
+   */
+
+  /** @typedef {{correct:number, total:number}} DiffStat */
+  /** @typedef {{correct:number, wrong:number, total:number}} TopicStat */
+
+  /**
+   * @typedef {Object} TestResults
+   * @property {ReviewRecord[]} records
+   * @property {number} correct
+   * @property {number} wrong
+   * @property {number} blank
+   * @property {number} total
+   * @property {Object.<string,DiffStat>} byDiff
+   * @property {Object.<string,TopicStat>} byTopic
+   * @property {number} elapsedSec
+   * @property {boolean} auto
+   * @property {number} unit
+   */
+
+  /** @type {Question[]} */
   var QUESTIONS = window.QUESTION_DATA || [];
   var LETTERS = ['A','B','C','D'];
 
+  /** @type {Object.<number,string[]>} */
   var TOPICS_BY_UNIT = {};
   QUESTIONS.forEach(function(q){
     TOPICS_BY_UNIT[q.unit] = TOPICS_BY_UNIT[q.unit] || [];
     if (TOPICS_BY_UNIT[q.unit].indexOf(q.topic) === -1) TOPICS_BY_UNIT[q.unit].push(q.topic);
   });
 
+  /** @type {Object.<number,{wordmark:string, headline:string, subhead:string, reportTitle:string}>} */
   var UNIT_META = {
     1: {
       wordmark: 'Unit I \u2014 Mathematical Foundation for AI',
@@ -28,9 +78,32 @@
       headline: 'Matrix Algebra',
       subhead: 'A mock test built from your own Unit III question bank, with a detailed solution behind every question.',
       reportTitle: 'Matrix Algebra \u2014 Unit III Mock Test Report'
+    },
+    4: {
+      wordmark: 'Unit IV \u2014 Elementary Graph Theory',
+      headline: 'Elementary Graph Theory',
+      subhead: 'A mock test built from your own Unit IV question bank, with a detailed solution behind every question.',
+      reportTitle: 'Elementary Graph Theory \u2014 Unit IV Mock Test Report'
     }
   };
 
+  /**
+   * @type {{
+   *   unit: number,
+   *   feedbackMode: ("exam"|"practice"),
+   *   testQuestions: Question[],
+   *   answers: Object.<number,string>,
+   *   marked: Object.<number,boolean>,
+   *   current: number,
+   *   timed: boolean,
+   *   remainingSec: number,
+   *   timerId: ?number,
+   *   startedAt: ?number,
+   *   finishedAt: ?number,
+   *   reviewFilter: string,
+   *   selectedTopics: Object.<string,boolean>
+   * }}
+   */
   var state = {
     unit: 1,
     feedbackMode: 'exam',
@@ -47,12 +120,50 @@
     selectedTopics: {}
   };
 
+  /**
+   * @param {string} id
+   * @returns {HTMLElement}
+   */
   function $(id){ return document.getElementById(id); }
+  /**
+   * @param {string} id
+   * @returns {HTMLButtonElement}
+   */
+  function $btn(id){ return /** @type {HTMLButtonElement} */ ($(id)); }
+  /**
+   * @param {("A"|"B"|"C"|"D")} letter
+   * @returns {?HTMLButtonElement}
+   */
+  function optionButton(letter){
+    return /** @type {?HTMLButtonElement} */ (document.querySelector('#options .option[data-letter="' + letter + '"]'));
+  }
+  /**
+   * Marks btn as the active choice within a toggle-button group (e.g. the
+   * unit switcher or the exam/practice switcher), clearing "active" from
+   * every other button in that group first. Shared by every such group so
+   * the clear-then-activate logic isn't repeated at each call site.
+   * @param {string} groupSelector
+   * @param {?Element} btn
+   */
+  function activateToggle(groupSelector, btn){
+    document.querySelectorAll(groupSelector).forEach(function(b){ b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+  }
+  /**
+   * @param {string} s
+   * @returns {string}
+   */
   function escapeHtml(s){
     return String(s).replace(/[&<>"']/g, function(c){
       return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
     });
   }
+  /**
+   * Fisher\u2013Yates shuffle. Returns a new shuffled array; does not mutate arr.
+   * @template T
+   * @param {T[]} arr
+   * @returns {T[]}
+   */
   function shuffle(arr){
     var a = arr.slice();
     for (var i = a.length - 1; i > 0; i--) {
@@ -61,17 +172,32 @@
     }
     return a;
   }
+  /**
+   * @param {number} n
+   * @returns {string}
+   */
   function pad2(n){ return n < 10 ? '0' + n : '' + n; }
+  /**
+   * @param {number} sec
+   * @returns {string}
+   */
   function fmtTime(sec){
     sec = Math.max(0, Math.round(sec));
     var m = Math.floor(sec / 60), s = sec % 60;
     return pad2(m) + ':' + pad2(s);
   }
+  /**
+   * @param {number} unit
+   * @returns {Question[]}
+   */
   function poolForUnit(unit){
     return QUESTIONS.filter(function(q){ return q.unit === unit; });
   }
 
   /* ---------------- screen switching ---------------- */
+  /**
+   * @param {string} name
+   */
   function showScreen(name){
     ['start','test','results'].forEach(function(n){
       $('screen-' + n).hidden = (n !== name);
@@ -82,6 +208,9 @@
   }
 
   /* ---------------- START SCREEN ---------------- */
+  /**
+   * @param {number} unit
+   */
   function applyUnitUI(unit){
     state.unit = unit;
     state.selectedTopics = {};
@@ -92,21 +221,20 @@
     $('wordmark-text').textContent = meta.wordmark;
     $('headline').textContent = meta.headline;
     $('subhead').textContent = meta.subhead;
-    $('stat-questions').textContent = pool.length;
-    $('stat-topics').textContent = topics.length;
+    $('stat-questions').textContent = String(pool.length);
+    $('stat-topics').textContent = String(topics.length);
     $('full-title').textContent = 'Full mock test';
     $('full-desc').textContent = 'All ' + pool.length + ' questions, every topic, in order.';
     $('quick-desc').textContent = '20 random questions across the unit.';
 
-    document.querySelectorAll('.mode-toggle-btn').forEach(function(b){ b.classList.remove('active'); });
-    document.querySelector('.mode-toggle-btn[data-feedback="exam"]').classList.add('active');
+    activateToggle('.mode-toggle-btn', document.querySelector('.mode-toggle-btn[data-feedback="exam"]'));
     state.feedbackMode = 'exam';
 
     var chipsWrap = $('topic-chips');
     chipsWrap.innerHTML = topics.map(function(t){
       return '<button type="button" class="topic-chip" data-topic="' + escapeHtml(t) + '">' + escapeHtml(t) + '</button>';
     }).join('');
-    var startTopicBtn = $('start-topic');
+    var startTopicBtn = $btn('start-topic');
     startTopicBtn.disabled = true;
     startTopicBtn.textContent = 'Select topics to start';
     chipsWrap.querySelectorAll('.topic-chip').forEach(function(btn){
@@ -116,7 +244,7 @@
         else { state.selectedTopics[t] = true; btn.classList.add('selected'); }
         var chosen = Object.keys(state.selectedTopics);
         var count = pool.filter(function(q){ return chosen.indexOf(q.topic) !== -1; }).length;
-        var startBtn = $('start-topic');
+        var startBtn = $btn('start-topic');
         startBtn.disabled = chosen.length === 0;
         startBtn.textContent = chosen.length === 0 ? 'Select topics to start' :
           ('Start practice \u2014 ' + count + ' question' + (count === 1 ? '' : 's'));
@@ -145,17 +273,15 @@
 
   document.querySelectorAll('.unit-toggle-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
-      document.querySelectorAll('.unit-toggle-btn').forEach(function(b){ b.classList.remove('active'); });
-      btn.classList.add('active');
+      activateToggle('.unit-toggle-btn', btn);
       applyUnitUI(parseInt(btn.getAttribute('data-unit'), 10));
     });
   });
 
   document.querySelectorAll('.mode-toggle-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
-      document.querySelectorAll('.mode-toggle-btn').forEach(function(b){ b.classList.remove('active'); });
-      btn.classList.add('active');
-      state.feedbackMode = btn.getAttribute('data-feedback');
+      activateToggle('.mode-toggle-btn', btn);
+      state.feedbackMode = /** @type {("exam"|"practice")} */ (btn.getAttribute('data-feedback'));
       updateModeMeta();
     });
   });
@@ -173,6 +299,9 @@
   });
 
   /* ---------------- TEST SCREEN ---------------- */
+  /**
+   * @param {Question[]} questions
+   */
   function beginTest(questions){
     state.testQuestions = questions;
     state.answers = {};
@@ -212,7 +341,7 @@
 
   function buildJumpStrip(){
     var strip = $('jump-strip');
-    strip.innerHTML = state.testQuestions.map(function(q, i){
+    strip.innerHTML = state.testQuestions.map(function(_q, i){
       return '<button type="button" class="jump-dot" data-i="' + i + '">' + (i + 1) + '</button>';
     }).join('');
     strip.querySelectorAll('.jump-dot').forEach(function(btn){
@@ -232,6 +361,9 @@
     });
   }
 
+  /**
+   * @param {number} i
+   */
   function renderQuestion(i){
     var total = state.testQuestions.length;
     var q = state.testQuestions[i];
@@ -267,7 +399,7 @@
 
     $('options').querySelectorAll('.option').forEach(function(btn){
       btn.addEventListener('click', function(){
-        selectOption(i, btn.getAttribute('data-letter'));
+        selectOption(i, /** @type {("A"|"B"|"C"|"D")} */ (btn.getAttribute('data-letter')));
       });
     });
 
@@ -287,12 +419,16 @@
     markBtn.textContent = state.marked[i] ? 'Marked for review' : 'Mark for review';
     markBtn.classList.toggle('is-marked', !!state.marked[i]);
 
-    $('btn-prev').disabled = i === 0;
+    $btn('btn-prev').disabled = i === 0;
     $('btn-next').textContent = (i === total - 1) ? 'Finish' : 'Next';
 
     refreshJumpStrip();
   }
 
+  /**
+   * @param {number} i
+   * @param {("A"|"B"|"C"|"D")} letter
+   */
   function selectOption(i, letter){
     if (state.feedbackMode === 'practice' && state.answers[i]) return; // locked after reveal
     state.answers[i] = letter;
@@ -340,6 +476,7 @@
   }
 
   /* ---------------- MODAL ---------------- */
+  /** @type {?function():void} */
   var modalConfirmHandler = null;
   function closeModal(){
     $('modal-backdrop').hidden = true;
@@ -348,6 +485,12 @@
       modalConfirmHandler = null;
     }
   }
+  /**
+   * @param {string} title
+   * @param {string} body
+   * @param {string} confirmLabel
+   * @param {function():void} onConfirm
+   */
   function openModal(title, body, confirmLabel, onConfirm){
     closeModal(); // drop any previously attached (e.g. cancelled) handler first
     $('modal-title').textContent = title;
@@ -363,12 +506,17 @@
   $('modal-cancel').addEventListener('click', closeModal);
 
   /* ---------------- RESULTS ---------------- */
+  /** @type {?TestResults} */
   var lastResults = null;
 
+  /**
+   * @param {boolean} auto
+   */
   function submitTest(auto){
     state.finishedAt = Date.now();
     var records = state.testQuestions.map(function(q, i){
       var userAnswer = state.answers[i] || null;
+      /** @type {("correct"|"wrong"|"blank")} */
       var status = userAnswer ? (userAnswer === q.answer ? 'correct' : 'wrong') : 'blank';
       return {
         idx: i, num: q.num, topic: q.topic, difficulty: q.difficulty,
@@ -377,25 +525,21 @@
       };
     });
 
-    var correct = records.filter(function(r){ return r.status === 'correct'; }).length;
-    var wrong = records.filter(function(r){ return r.status === 'wrong'; }).length;
-    var blank = records.filter(function(r){ return r.status === 'blank'; }).length;
-    var total = records.length;
-
+    var correct = 0, wrong = 0, blank = 0;
+    /** @type {Object.<string,DiffStat>} */
     var byDiff = {};
+    /** @type {Object.<string,TopicStat>} */
+    var byTopic = {};
     records.forEach(function(r){
       byDiff[r.difficulty] = byDiff[r.difficulty] || { correct: 0, total: 0 };
       byDiff[r.difficulty].total++;
-      if (r.status === 'correct') byDiff[r.difficulty].correct++;
-    });
-
-    var byTopic = {};
-    records.forEach(function(r){
       byTopic[r.topic] = byTopic[r.topic] || { correct: 0, wrong: 0, total: 0 };
       byTopic[r.topic].total++;
-      if (r.status === 'correct') byTopic[r.topic].correct++;
-      if (r.status === 'wrong') byTopic[r.topic].wrong++;
+      if (r.status === 'correct') { correct++; byDiff[r.difficulty].correct++; byTopic[r.topic].correct++; }
+      else if (r.status === 'wrong') { wrong++; byTopic[r.topic].wrong++; }
+      else { blank++; }
     });
+    var total = records.length;
 
     lastResults = {
       records: records, correct: correct, wrong: wrong, blank: blank, total: total,
@@ -410,6 +554,9 @@
     showScreen('results');
   }
 
+  /**
+   * @param {number} pct
+   */
   function scoreNote(pct){
     if (pct >= 90) return 'An excellent handle on this material \u2014 the fundamentals are solid.';
     if (pct >= 75) return 'A strong pass. A look at the flagged topics below will round it out.';
@@ -476,7 +623,7 @@
       '</div>';
 
     $('results-content').innerHTML = html;
-    $('results-content').querySelectorAll('[data-pct]').forEach(function(el){
+    $('results-content').querySelectorAll('[data-pct]').forEach(function(/** @type {HTMLElement} */ el){
       el.style.width = el.getAttribute('data-pct') + '%';
     });
 
@@ -588,8 +735,20 @@
       var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       var dragging = false, lastX = 0, lastY = 0, velX = 0, velY = 0;
-      function pos(e){ return e.touches ? e.touches[0] : e; }
+      /**
+       * @param {(PointerEvent|TouchEvent)} e
+       */
+      function pos(e){
+        if ('touches' in e && e.touches && e.touches.length) return e.touches[0];
+        return /** @type {PointerEvent} */ (e);
+      }
+      /**
+       * @param {(PointerEvent|TouchEvent)} e
+       */
       function onDown(e){ dragging = true; var p = pos(e); lastX = p.clientX; lastY = p.clientY; container.style.cursor = 'grabbing'; }
+      /**
+       * @param {(PointerEvent|TouchEvent)} e
+       */
       function onMove(e){
         if (!dragging) return;
         var p = pos(e);
@@ -649,18 +808,19 @@
     if (key === 'ArrowLeft' || key === 'p') { $('btn-prev').click(); return; }
     if (key === 'm') { $('btn-mark').click(); return; }
 
-    if (['1', '2', '3', '4'].indexOf(key) !== -1) {
-      var letter = LETTERS[parseInt(key, 10) - 1];
-      var btn = document.querySelector('#options .option[data-letter="' + letter + '"]');
+    if (['1', '2', '3', '4'].indexOf(key) !== -1 || ['a', 'b', 'c', 'd'].indexOf(key) !== -1) {
+      var letter = /** @type {("A"|"B"|"C"|"D")} */ (
+        key >= '1' && key <= '4' ? LETTERS[parseInt(key, 10) - 1] : key.toUpperCase()
+      );
+      var btn = optionButton(letter);
       if (btn && !btn.disabled) btn.click();
-    } else if (['a', 'b', 'c', 'd'].indexOf(key) !== -1) {
-      var letter2 = key.toUpperCase();
-      var btn2 = document.querySelector('#options .option[data-letter="' + letter2 + '"]');
-      if (btn2 && !btn2.disabled) btn2.click();
     }
   });
 
   /* ---------------- downloadable report ---------------- */
+  /**
+   * @param {TestResults} r
+   */
   function buildReportText(r){
     var meta = UNIT_META[r.unit] || UNIT_META[1];
     var lines = [];

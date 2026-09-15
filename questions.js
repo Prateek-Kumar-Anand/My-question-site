@@ -5441,5 +5441,2373 @@ window.QUESTION_DATA = [
     "solution": "The Cayley–Hamilton theorem states that every matrix satisfies its own characteristic equation, so substituting A in place of λ makes A² − 3A + 2I equal the zero matrix — this is also how higher powers and the inverse of A can be found in terms of lower powers.",
     "unit": 3,
     "kind": "mcq"
+  },
+  {
+    "num": 1,
+    "topic": "Basic Terminology of Graphs",
+    "difficulty": "Easy",
+    "question": "A graph G = (V, E) consists of:",
+    "options": {
+      "A": "A set of vertices only",
+      "B": "A set of edges only",
+      "C": "A set of vertices V and a set of edges E connecting pairs of vertices",
+      "D": "A matrix of numbers"
+    },
+    "answer": "C",
+    "solution": "A graph is formally a pair (V, E): a vertex set and an edge set describing which pairs of vertices are connected.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 2,
+    "topic": "Basic Terminology of Graphs",
+    "difficulty": "Easy",
+    "question": "A pseudograph is a graph that may contain:",
+    "options": {
+      "A": "Only simple edges",
+      "B": "Loops and multiple edges between the same pair of vertices",
+      "C": "Only directed edges",
+      "D": "No edges at all"
+    },
+    "answer": "B",
+    "solution": "A simple graph forbids loops and multi-edges; a multigraph allows multiple edges; a pseudograph relaxes both restrictions, allowing loops too.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 3,
+    "topic": "Basic Terminology of Graphs",
+    "difficulty": "Easy",
+    "question": "A vertex of degree 0 is called:",
+    "options": {
+      "A": "An isolated vertex",
+      "B": "A pendant vertex",
+      "C": "A regular vertex",
+      "D": "A cut vertex"
+    },
+    "answer": "A",
+    "solution": "A vertex with no incident edges (degree 0) is isolated; a vertex of degree exactly 1 is instead called pendant.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 4,
+    "topic": "Basic Terminology of Graphs",
+    "difficulty": "Moderate",
+    "question": "A loop at a vertex contributes how much to the degree of that vertex?",
+    "options": {
+      "A": "0",
+      "B": "1",
+      "C": "2",
+      "D": "Depends on the graph"
+    },
+    "answer": "C",
+    "solution": "By convention a loop is counted twice toward the degree of its vertex, since both its \"ends\" attach to that vertex — this keeps the Handshaking Lemma consistent.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 5,
+    "topic": "Basic Terminology of Graphs",
+    "difficulty": "Easy",
+    "question": "Two vertices are said to be adjacent if:",
+    "options": {
+      "A": "They have the same degree",
+      "B": "There is an edge connecting them directly",
+      "C": "They belong to different components",
+      "D": "They are both isolated"
+    },
+    "answer": "B",
+    "solution": "Adjacency is a direct relationship: two vertices are adjacent exactly when an edge joins them.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 6,
+    "topic": "Basic Terminology of Graphs",
+    "difficulty": "Easy",
+    "question": "A graph is called finite if:",
+    "options": {
+      "A": "It has a finite diameter",
+      "B": "Both its vertex set and edge set are finite",
+      "C": "It has no cycles",
+      "D": "It has an even number of vertices"
+    },
+    "answer": "B",
+    "solution": "Finiteness refers to the sizes of V and E themselves being finite, not to any distance-based property.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 7,
+    "topic": "Basic Terminology of Graphs",
+    "difficulty": "Moderate",
+    "question": "A graph in which every vertex has the same degree k is called:",
+    "options": {
+      "A": "A complete graph",
+      "B": "A k-regular graph",
+      "C": "A bipartite graph",
+      "D": "A planar graph"
+    },
+    "answer": "B",
+    "solution": "\"k-regular\" specifically means every vertex shares the identical degree k; complete graphs are a special case (regular of degree n−1).",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 8,
+    "topic": "Basic Terminology of Graphs",
+    "difficulty": "Moderate",
+    "question": "How does a trivial graph differ from a null graph?",
+    "options": {
+      "A": "A trivial graph has exactly one vertex and no edges, while a null graph has any number of vertices and no edges",
+      "B": "They are the same thing",
+      "C": "A trivial graph has no vertices",
+      "D": "A null graph must be connected"
+    },
+    "answer": "A",
+    "solution": "\"Null graph\" describes any edgeless graph; \"trivial graph\" is the special case with exactly one vertex.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 9,
+    "topic": "Basic Terminology of Graphs",
+    "difficulty": "Easy",
+    "question": "In graph theory, the \"order\" of a graph refers to:",
+    "options": {
+      "A": "The number of edges",
+      "B": "The number of vertices",
+      "C": "The maximum degree",
+      "D": "The number of connected components"
+    },
+    "answer": "B",
+    "solution": "Order counts vertices; \"size\" is the separate term for the number of edges.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 10,
+    "topic": "Basic Terminology of Graphs",
+    "difficulty": "Moderate",
+    "question": "A consequence of the Handshaking Lemma is that in any undirected graph, the number of vertices with odd degree is:",
+    "options": {
+      "A": "Always odd",
+      "B": "Always even",
+      "C": "Always zero",
+      "D": "Unrelated to the lemma"
+    },
+    "answer": "B",
+    "solution": "Since the sum of all degrees is 2|E| (even), the odd-degree vertices must sum to an even number too, which is only possible if there is an even count of them.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 11,
+    "topic": "Connected & Disconnected Graphs",
+    "difficulty": "Easy",
+    "question": "A graph is called connected if:",
+    "options": {
+      "A": "It has no cycles",
+      "B": "Every pair of vertices is joined by a path",
+      "C": "It has exactly one edge",
+      "D": "All vertices have the same degree"
+    },
+    "answer": "B",
+    "solution": "Connectedness means you can reach any vertex from any other by travelling along edges.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 12,
+    "topic": "Connected & Disconnected Graphs",
+    "difficulty": "Easy",
+    "question": "A connected component of a graph is:",
+    "options": {
+      "A": "The largest cycle in the graph",
+      "B": "A maximal connected subgraph",
+      "C": "Any subgraph with one edge",
+      "D": "The set of all isolated vertices"
+    },
+    "answer": "B",
+    "solution": "A component is a maximal set of vertices (with their edges) that are mutually reachable — it can't be extended by adding more connected vertices.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 13,
+    "topic": "Connected & Disconnected Graphs",
+    "difficulty": "Moderate",
+    "question": "If every pair of distinct vertices in a graph G is joined by a path, then G is:",
+    "options": {
+      "A": "Necessarily disconnected",
+      "B": "Necessarily connected",
+      "C": "Necessarily a tree",
+      "D": "Necessarily a cycle"
+    },
+    "answer": "B",
+    "solution": "This is precisely the definition of connectedness — a path between every pair of vertices.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 14,
+    "topic": "Connected & Disconnected Graphs",
+    "difficulty": "Moderate",
+    "question": "A graph with exactly 3 connected components must have its vertices split into:",
+    "options": {
+      "A": "Exactly 3 vertices total",
+      "B": "3 nonempty groups, each internally connected, with no edges between groups",
+      "C": "3 cycles",
+      "D": "3 pendant vertices"
+    },
+    "answer": "B",
+    "solution": "Each component is internally connected, and by definition there are no edges crossing between different components.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 15,
+    "topic": "Connected & Disconnected Graphs",
+    "difficulty": "Hard",
+    "question": "A graph has n vertices and n−1 edges. Must it be connected?",
+    "options": {
+      "A": "Yes, always",
+      "B": "No — for example, a triangle (3 vertices, 3 edges) plus 1 isolated vertex has n=4 vertices and n−1=3 edges, yet is disconnected",
+      "C": "Yes, but only if n is even",
+      "D": "No graph like this can exist"
+    },
+    "answer": "B",
+    "solution": "Having exactly n−1 edges is necessary but not sufficient for connectivity — the edges could form a cycle among some vertices while leaving others isolated.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 16,
+    "topic": "Connected & Disconnected Graphs",
+    "difficulty": "Moderate",
+    "question": "The minimum number of edges needed for a connected simple graph with n vertices is:",
+    "options": {
+      "A": "n",
+      "B": "n − 1",
+      "C": "n(n−1)/2",
+      "D": "2n"
+    },
+    "answer": "B",
+    "solution": "This minimum is achieved exactly by a tree on n vertices; any fewer edges would leave the graph disconnected.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 17,
+    "topic": "Connected & Disconnected Graphs",
+    "difficulty": "Moderate",
+    "question": "The maximum number of connected components a simple graph with n vertices can have is:",
+    "options": {
+      "A": "1",
+      "B": "n/2",
+      "C": "n (every vertex isolated)",
+      "D": "n − 1"
+    },
+    "answer": "C",
+    "solution": "With zero edges, every one of the n vertices is its own component — the most components possible.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 18,
+    "topic": "Connected & Disconnected Graphs",
+    "difficulty": "Moderate",
+    "question": "If you add a single edge connecting two different connected components of a graph, the total number of components:",
+    "options": {
+      "A": "Increases by 1",
+      "B": "Stays the same",
+      "C": "Decreases by exactly 1",
+      "D": "Decreases by 2"
+    },
+    "answer": "C",
+    "solution": "The new edge merges exactly those two components into one, reducing the total count by one.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 19,
+    "topic": "Connected & Disconnected Graphs",
+    "difficulty": "Moderate",
+    "question": "For a connected simple graph with 8 vertices, the maximum possible number of edges is:",
+    "options": {
+      "A": "7",
+      "B": "16",
+      "C": "28",
+      "D": "56"
+    },
+    "answer": "C",
+    "solution": "The maximum is achieved by the complete graph K8, which has 8·7/2 = 28 edges and is automatically connected.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 20,
+    "topic": "Connected & Disconnected Graphs",
+    "difficulty": "Hard",
+    "question": "A graph has 12 vertices split into 4 connected, nonempty components. What is the minimum possible total number of edges?",
+    "options": {
+      "A": "4",
+      "B": "8",
+      "C": "11",
+      "D": "12"
+    },
+    "answer": "B",
+    "solution": "Each component needs at least (its size − 1) edges to stay connected (i.e. be a tree). Summed over all 4 components this gives 12 − 4 = 8, regardless of how the 12 vertices are split among them.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 21,
+    "topic": "Subgraphs",
+    "difficulty": "Easy",
+    "question": "A subgraph of G is a graph H such that:",
+    "options": {
+      "A": "H has more vertices than G",
+      "B": "V(H) ⊆ V(G) and E(H) ⊆ E(G), consistent with G",
+      "C": "H has no edges",
+      "D": "H and G have the same edge set only"
+    },
+    "answer": "B",
+    "solution": "A subgraph simply keeps a subset of the vertices and a subset of the edges (whose endpoints must still be present).",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 22,
+    "topic": "Subgraphs",
+    "difficulty": "Easy",
+    "question": "A spanning subgraph of G is a subgraph that:",
+    "options": {
+      "A": "Contains all vertices of G but possibly fewer edges",
+      "B": "Contains all edges of G but fewer vertices",
+      "C": "Is identical to G",
+      "D": "Has exactly one vertex"
+    },
+    "answer": "A",
+    "solution": "\"Spanning\" refers to covering every vertex of the original graph; the edge set may be a proper subset.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 23,
+    "topic": "Subgraphs",
+    "difficulty": "Moderate",
+    "question": "An induced subgraph on a vertex subset S contains:",
+    "options": {
+      "A": "Only some of the edges between vertices in S",
+      "B": "All edges of G that have both endpoints in S",
+      "C": "No edges at all",
+      "D": "All vertices of G, regardless of S"
+    },
+    "answer": "B",
+    "solution": "Induction on S means keeping every original edge whose two endpoints both lie in S — none are left out.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 24,
+    "topic": "Subgraphs",
+    "difficulty": "Moderate",
+    "question": "An edge-induced subgraph on a set of edges F consists of:",
+    "options": {
+      "A": "The edges in F together with all vertices of G",
+      "B": "The edges in F together with exactly the vertices that are endpoints of edges in F",
+      "C": "Only isolated vertices",
+      "D": "A random subset of vertices"
+    },
+    "answer": "B",
+    "solution": "Edge-induction starts from the chosen edges and includes precisely the vertices needed to support them.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 25,
+    "topic": "Subgraphs",
+    "difficulty": "Moderate",
+    "question": "For G with V={a,b,c,d} and E={ab,bc,cd,da,ac}, which of the following IS a valid subgraph of G?",
+    "options": {
+      "A": "Vertex set {a,b,c}, edge set {ab,bc,ac}",
+      "B": "Vertex set {a,b}, edge set {ab,bc}",
+      "C": "Vertex set {a,b,c,d}, edge set {bd}",
+      "D": "Vertex set {a,e}, edge set {ae}"
+    },
+    "answer": "A",
+    "solution": "All three edges ab, bc, ac exist in E and both endpoints of each lie in {a,b,c}. Option B includes bc even though c isn't in the vertex set; C uses edge bd, which isn't in E; D introduces vertex e, which isn't in G at all.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 26,
+    "topic": "Subgraphs",
+    "difficulty": "Moderate",
+    "question": "A graph with m edges has how many distinct spanning subgraphs (each formed by keeping all vertices and choosing any subset of the edges)?",
+    "options": {
+      "A": "m",
+      "B": "m²",
+      "C": "2^m",
+      "D": "m!"
+    },
+    "answer": "C",
+    "solution": "Each of the m edges can independently be included or excluded, giving 2^m possible edge subsets and hence 2^m spanning subgraphs.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 27,
+    "topic": "Subgraphs",
+    "difficulty": "Easy",
+    "question": "Every subgraph of a simple graph is also simple because:",
+    "options": {
+      "A": "It automatically gains loops",
+      "B": "It cannot inherit loops or multiple edges, since the original graph has none",
+      "C": "It always has fewer vertices",
+      "D": "Subgraphs are never simple"
+    },
+    "answer": "B",
+    "solution": "A subgraph can only keep edges that already existed in G; if G had no loops or multi-edges, none can appear in any subgraph either.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 28,
+    "topic": "Subgraphs",
+    "difficulty": "Moderate",
+    "question": "Can a subgraph of a connected graph be disconnected?",
+    "options": {
+      "A": "No, never",
+      "B": "Yes — for example, removing the middle vertex of a path can split it into two disconnected pieces",
+      "C": "Only if the original graph is a tree",
+      "D": "Only if the subgraph has zero edges"
+    },
+    "answer": "B",
+    "solution": "Connectivity of G says nothing about every possible subgraph; deleting a well-chosen vertex or edge can easily break connectivity in the remainder.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 29,
+    "topic": "Subgraphs",
+    "difficulty": "Hard",
+    "question": "A connected graph G has 6 vertices and 8 edges. Can a spanning subgraph of G with only 5 edges still be connected?",
+    "options": {
+      "A": "No, connectivity always requires all 8 edges",
+      "B": "No, 5 edges can never connect 6 vertices",
+      "C": "Yes — a tree on 6 vertices needs exactly 5 edges, so this is possible if those 5 edges form a spanning tree of G",
+      "D": "Yes, but only if G is complete"
+    },
+    "answer": "C",
+    "solution": "A connected graph on 6 vertices needs a minimum of 5 edges (a spanning tree); if such a set of 5 edges exists within G's 8 edges, the resulting spanning subgraph is connected.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 30,
+    "topic": "Subgraphs",
+    "difficulty": "Moderate",
+    "question": "A graph with at least two distinct spanning trees must contain:",
+    "options": {
+      "A": "At least one cycle",
+      "B": "No cycles at all",
+      "C": "Exactly n vertices and n−1 edges only",
+      "D": "A directed edge"
+    },
+    "answer": "A",
+    "solution": "Extra edges beyond a tree's n−1 create a cycle, and different choices of which cycle-edge to drop yield different spanning trees.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 31,
+    "topic": "Paths & Cycles",
+    "difficulty": "Easy",
+    "question": "Which of the following correctly distinguishes a \"trail\" from a \"path\"?",
+    "options": {
+      "A": "A trail cannot repeat edges but may repeat vertices; a path cannot repeat either",
+      "B": "A trail cannot repeat vertices; a path can",
+      "C": "They are exactly the same",
+      "D": "A trail must be closed; a path cannot be closed"
+    },
+    "answer": "A",
+    "solution": "A trail's only restriction is no repeated edges; a path is stricter, additionally forbidding repeated vertices.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 32,
+    "topic": "Paths & Cycles",
+    "difficulty": "Easy",
+    "question": "A \"simple path\" additionally requires that:",
+    "options": {
+      "A": "No edge is repeated only",
+      "B": "No vertex is repeated (which also prevents any edge repetition)",
+      "C": "The walk must be closed",
+      "D": "All vertices have even degree"
+    },
+    "answer": "B",
+    "solution": "Forbidding repeated vertices is the defining feature of a (simple) path, and it automatically rules out repeated edges too.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 33,
+    "topic": "Paths & Cycles",
+    "difficulty": "Moderate",
+    "question": "What is the key difference between a cycle and a circuit?",
+    "options": {
+      "A": "A cycle repeats no vertices (except start/end); a circuit is any closed trail, which may repeat vertices",
+      "B": "A circuit must have odd length",
+      "C": "A cycle can repeat edges",
+      "D": "There is no difference"
+    },
+    "answer": "A",
+    "solution": "A circuit only forbids repeated edges (it's a closed trail); a cycle is the stricter case where no vertex besides the shared start/end repeats.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 34,
+    "topic": "Paths & Cycles",
+    "difficulty": "Easy",
+    "question": "The \"length\" of a walk, path, or cycle is defined as:",
+    "options": {
+      "A": "The number of vertices it contains",
+      "B": "The number of edges it contains",
+      "C": "The sum of vertex degrees",
+      "D": "The diameter of the graph"
+    },
+    "answer": "B",
+    "solution": "Length is measured by edge count, not vertex count (a walk with k edges visits up to k+1 vertices).",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 35,
+    "topic": "Paths & Cycles",
+    "difficulty": "Moderate",
+    "question": "In a simple graph, why must the shortest walk between two vertices be a path?",
+    "options": {
+      "A": "Because paths are always shorter than walks by definition",
+      "B": "Because if a vertex repeated, the loop between the repeats could be removed to get a shorter walk, contradicting minimality",
+      "C": "Because all walks are automatically paths",
+      "D": "Because shortest walks always have even length"
+    },
+    "answer": "B",
+    "solution": "Any repeated vertex creates a detour that can be cut out, so a truly shortest walk can have no repeats — making it a path.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 36,
+    "topic": "Paths & Cycles",
+    "difficulty": "Moderate",
+    "question": "Can a graph contain a closed trail that is NOT a cycle?",
+    "options": {
+      "A": "No, closed trails and cycles are identical",
+      "B": "Yes — a closed trail that revisits a vertex (like a figure-eight shape) is not a cycle, since cycles cannot repeat vertices",
+      "C": "Only in directed graphs",
+      "D": "Only if the graph has no edges"
+    },
+    "answer": "B",
+    "solution": "A closed trail only avoids repeating edges; revisiting a vertex is allowed, which disqualifies it from being a cycle.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 37,
+    "topic": "Paths & Cycles",
+    "difficulty": "Moderate",
+    "question": "For the graph with edges ab, bc, cd, da, ac, which sequence is a cycle?",
+    "options": {
+      "A": "a-b-c-a",
+      "B": "a-b-a-c",
+      "C": "a-b-c-d-a",
+      "D": "Both A and C"
+    },
+    "answer": "D",
+    "solution": "a-b-c-a uses edges ab, bc, ac (all present) and revisits no vertex except the shared start/end — a valid triangle cycle. a-b-c-d-a uses ab, bc, cd, da (all present) — a valid 4-cycle. Both qualify.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 38,
+    "topic": "Paths & Cycles",
+    "difficulty": "Moderate",
+    "question": "If two vertices are connected by a walk, why are they also connected by a path?",
+    "options": {
+      "A": "Because walks are automatically paths",
+      "B": "Any repeated vertex in the walk can be \"shortcut\" by removing the loop between the repeats, eventually yielding a path",
+      "C": "Because walks must be finite",
+      "D": "Because the graph must be a tree"
+    },
+    "answer": "B",
+    "solution": "Repeatedly trimming out repeated-vertex detours from a walk eventually leaves a walk with no repeats — a path — between the same two endpoints.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 39,
+    "topic": "Paths & Cycles",
+    "difficulty": "Moderate",
+    "question": "In a simple graph with n vertices, the maximum possible length of a simple path is:",
+    "options": {
+      "A": "n",
+      "B": "n − 1",
+      "C": "n + 1",
+      "D": "2n"
+    },
+    "answer": "B",
+    "solution": "A path visiting all n vertices (a Hamiltonian path) uses exactly n−1 edges, which is the longest a simple path can be.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 40,
+    "topic": "Paths & Cycles",
+    "difficulty": "Moderate",
+    "question": "A graph contains a cycle of length 5. What can you conclude about its number of vertices and edges?",
+    "options": {
+      "A": "The graph has exactly 5 vertices and 5 edges in total",
+      "B": "The graph has at least 5 vertices and at least 5 edges",
+      "C": "The graph must be complete",
+      "D": "The graph must be a tree"
+    },
+    "answer": "B",
+    "solution": "The cycle itself accounts for 5 distinct vertices and 5 edges, but the surrounding graph could well contain more of both.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 41,
+    "topic": "Complete Graphs",
+    "difficulty": "Easy",
+    "question": "A complete graph on n vertices, where every pair of distinct vertices is joined by an edge, is denoted:",
+    "options": {
+      "A": "Cn",
+      "B": "Kn",
+      "C": "Pn",
+      "D": "Qn"
+    },
+    "answer": "B",
+    "solution": "Kn is the standard notation for the complete graph on n vertices; Cn and Pn instead denote cycle and path graphs.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 42,
+    "topic": "Complete Graphs",
+    "difficulty": "Easy",
+    "question": "How many edges does K4 (the complete graph on 4 vertices) have?",
+    "options": {
+      "A": "4",
+      "B": "6",
+      "C": "8",
+      "D": "12"
+    },
+    "answer": "B",
+    "solution": "Using n(n−1)/2 with n=4 gives 4·3/2 = 6 edges.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 43,
+    "topic": "Complete Graphs",
+    "difficulty": "Moderate",
+    "question": "The number of edges in the complete graph Kn is given by:",
+    "options": {
+      "A": "n²",
+      "B": "n(n−1)",
+      "C": "n(n−1)/2",
+      "D": "2n"
+    },
+    "answer": "C",
+    "solution": "Every pair of the n vertices is joined exactly once, and the number of unordered pairs is n(n−1)/2.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 44,
+    "topic": "Complete Graphs",
+    "difficulty": "Moderate",
+    "question": "In K8, how many edges are there, and what is the degree of every vertex?",
+    "options": {
+      "A": "28 edges, degree 7",
+      "B": "56 edges, degree 8",
+      "C": "28 edges, degree 8",
+      "D": "16 edges, degree 7"
+    },
+    "answer": "A",
+    "solution": "Edges: 8·7/2 = 28. Each vertex connects to all 7 others, so every vertex has degree 7.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 45,
+    "topic": "Complete Graphs",
+    "difficulty": "Easy",
+    "question": "Is Kn connected for every positive integer n?",
+    "options": {
+      "A": "No, only for even n",
+      "B": "Yes — every pair of vertices in Kn is directly joined by an edge, so it is always connected",
+      "C": "No, only for n ≥ 3",
+      "D": "It depends on whether n is prime"
+    },
+    "answer": "B",
+    "solution": "With every possible edge present, any vertex can reach any other in a single step, so Kn is connected for all n ≥ 1.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 46,
+    "topic": "Complete Graphs",
+    "difficulty": "Easy",
+    "question": "Kn is a regular graph because:",
+    "options": {
+      "A": "It has no edges",
+      "B": "Every vertex has the same degree, n − 1",
+      "C": "It is planar",
+      "D": "It has exactly one cycle"
+    },
+    "answer": "B",
+    "solution": "Each vertex is adjacent to all n−1 others, giving every vertex identical degree n−1 — the definition of regularity.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 47,
+    "topic": "Complete Graphs",
+    "difficulty": "Moderate",
+    "question": "How many distinct triangles (3-vertex complete subgraphs) exist in K6?",
+    "options": {
+      "A": "6",
+      "B": "15",
+      "C": "20",
+      "D": "120"
+    },
+    "answer": "C",
+    "solution": "Any 3 of the 6 vertices automatically form a triangle in K6 (all edges exist), and C(6,3) = 20.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 48,
+    "topic": "Complete Graphs",
+    "difficulty": "Moderate",
+    "question": "In Kn, how many distinct paths of length 2 exist between two fixed vertices u and v?",
+    "options": {
+      "A": "n",
+      "B": "n − 1",
+      "C": "n − 2",
+      "D": "n(n−1)/2"
+    },
+    "answer": "C",
+    "solution": "Each such path uses exactly one intermediate vertex, which can be any of the remaining n−2 vertices (excluding u and v themselves).",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 49,
+    "topic": "Complete Graphs",
+    "difficulty": "Moderate",
+    "question": "Kn is planar only for:",
+    "options": {
+      "A": "n ≤ 4",
+      "B": "n ≤ 5",
+      "C": "All n",
+      "D": "Only even n"
+    },
+    "answer": "A",
+    "solution": "K4 can be drawn without crossings, but K5 is the smallest complete graph that cannot — so Kn is planar exactly when n ≤ 4.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 50,
+    "topic": "Complete Graphs",
+    "difficulty": "Easy",
+    "question": "The complement of Kn (on the same vertex set) is:",
+    "options": {
+      "A": "Another copy of Kn",
+      "B": "A null graph (no edges)",
+      "C": "A tree",
+      "D": "A cycle graph"
+    },
+    "answer": "B",
+    "solution": "Kn already contains every possible edge, so its complement — the edges NOT in Kn — has none left.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 51,
+    "topic": "Directed Graphs (Digraphs)",
+    "difficulty": "Easy",
+    "question": "A directed graph (digraph) differs from an undirected graph in that:",
+    "options": {
+      "A": "It has no vertices",
+      "B": "Its edges (arcs) have a direction, from one vertex to another",
+      "C": "It cannot have cycles",
+      "D": "It must be complete"
+    },
+    "answer": "B",
+    "solution": "Each arc in a digraph points from a specific initial vertex to a specific terminal vertex, unlike undirected edges.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 52,
+    "topic": "Directed Graphs (Digraphs)",
+    "difficulty": "Easy",
+    "question": "In a directed edge (arc) u→v, u is called the ___ and v is called the ___.",
+    "options": {
+      "A": "Terminal vertex; initial vertex",
+      "B": "Initial vertex; terminal vertex",
+      "C": "Parent; child",
+      "D": "Root; leaf"
+    },
+    "answer": "B",
+    "solution": "By convention the arrow points from the initial (tail) vertex to the terminal (head) vertex.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 53,
+    "topic": "Directed Graphs (Digraphs)",
+    "difficulty": "Easy",
+    "question": "The indegree of a vertex in a digraph is:",
+    "options": {
+      "A": "The number of arcs leaving the vertex",
+      "B": "The number of arcs entering the vertex",
+      "C": "The total number of arcs in the graph",
+      "D": "The number of loops at the vertex"
+    },
+    "answer": "B",
+    "solution": "Indegree counts incoming arcs; outdegree (the complementary notion) counts outgoing ones.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 54,
+    "topic": "Directed Graphs (Digraphs)",
+    "difficulty": "Moderate",
+    "question": "The directed version of the Handshaking Lemma states that:",
+    "options": {
+      "A": "The sum of all indegrees equals the sum of all outdegrees, and both equal the number of arcs",
+      "B": "The sum of indegrees is always greater than the sum of outdegrees",
+      "C": "Every vertex must have equal indegree and outdegree",
+      "D": "The lemma does not apply to digraphs"
+    },
+    "answer": "A",
+    "solution": "Every arc contributes exactly one to some vertex's outdegree and exactly one to some vertex's indegree, so both totals equal the arc count.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 55,
+    "topic": "Directed Graphs (Digraphs)",
+    "difficulty": "Moderate",
+    "question": "A directed cycle is a closed directed walk in which:",
+    "options": {
+      "A": "All arcs point consistently along the cycle and no vertex (except the shared start/end) repeats",
+      "B": "Arcs may point in any direction",
+      "C": "Only the initial vertex has outdegree 0",
+      "D": "It must include every vertex of the graph"
+    },
+    "answer": "A",
+    "solution": "Like an undirected cycle but respecting arc direction throughout, returning to the start without revisiting any other vertex.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 56,
+    "topic": "Directed Graphs (Digraphs)",
+    "difficulty": "Moderate",
+    "question": "In a digraph, a vertex has indegree 3 and outdegree 1. How many arcs are incident to (entering or leaving) that vertex in total?",
+    "options": {
+      "A": "3",
+      "B": "4",
+      "C": "1",
+      "D": "2"
+    },
+    "answer": "B",
+    "solution": "Total incident arcs = indegree + outdegree = 3 + 1 = 4.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 57,
+    "topic": "Directed Graphs (Digraphs)",
+    "difficulty": "Moderate",
+    "question": "For the digraph with arcs a→b, b→c, c→a, c→d, d→b, what is the indegree of vertex b?",
+    "options": {
+      "A": "1",
+      "B": "2",
+      "C": "3",
+      "D": "0"
+    },
+    "answer": "B",
+    "solution": "Arcs entering b are a→b and d→b, giving b an indegree of 2.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 58,
+    "topic": "Directed Graphs (Digraphs)",
+    "difficulty": "Moderate",
+    "question": "A digraph is strongly connected if:",
+    "options": {
+      "A": "Its underlying undirected graph is connected",
+      "B": "For every pair of vertices u, v, there is a directed path from u to v AND from v to u",
+      "C": "It has no cycles",
+      "D": "Every vertex has indegree 0"
+    },
+    "answer": "B",
+    "solution": "Strong connectivity demands mutual reachability in both directions between every pair of vertices.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 59,
+    "topic": "Directed Graphs (Digraphs)",
+    "difficulty": "Moderate",
+    "question": "Why does a strongly connected digraph have to be weakly connected as well?",
+    "options": {
+      "A": "It doesn't — they're unrelated",
+      "B": "Because directed paths between every pair of vertices imply the underlying undirected graph is also connected",
+      "C": "Because weak connectivity is a stronger condition",
+      "D": "Because strongly connected digraphs have no arcs"
+    },
+    "answer": "B",
+    "solution": "If you can reach every vertex from every other respecting direction, you can certainly reach it ignoring direction — so the underlying undirected graph is connected too.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 60,
+    "topic": "Directed Graphs (Digraphs)",
+    "difficulty": "Moderate",
+    "question": "For a directed 3-cycle a→b→c→a, what does the adjacency matrix look like (rows/columns ordered a, b, c)?",
+    "options": {
+      "A": "A 1 exactly where row i has an arc to column j (e.g. A[a][b]=1, A[b][c]=1, A[c][a]=1), 0 elsewhere",
+      "B": "A symmetric matrix with 1s everywhere except the diagonal",
+      "C": "The identity matrix",
+      "D": "A matrix of all zeros"
+    },
+    "answer": "A",
+    "solution": "Each arc u→v places a single 1 at row u, column v; since the cycle has only those three arcs, only those three entries are 1.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 61,
+    "topic": "Weighted Graphs",
+    "difficulty": "Easy",
+    "question": "In a weighted graph, the weight of an edge typically represents:",
+    "options": {
+      "A": "The number of times that edge is used",
+      "B": "A cost, distance, or capacity associated with that edge",
+      "C": "The degree of its endpoints",
+      "D": "Whether the edge is directed"
+    },
+    "answer": "B",
+    "solution": "Weights attach real-world quantities — like distance, time, or cost — to each edge.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 62,
+    "topic": "Weighted Graphs",
+    "difficulty": "Easy",
+    "question": "The key difference between a weighted and an unweighted graph is that:",
+    "options": {
+      "A": "Weighted graphs have more vertices",
+      "B": "Every edge in a weighted graph carries a numerical value, while unweighted edges are treated as equal",
+      "C": "Unweighted graphs cannot have cycles",
+      "D": "Weighted graphs must be directed"
+    },
+    "answer": "B",
+    "solution": "The presence (or absence) of numeric edge weights is the only structural difference between the two.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 63,
+    "topic": "Weighted Graphs",
+    "difficulty": "Easy",
+    "question": "The total weight (cost) of a path in a weighted graph is:",
+    "options": {
+      "A": "The number of edges in the path",
+      "B": "The sum of the weights of the edges along the path",
+      "C": "The weight of the heaviest edge only",
+      "D": "The average of all edge weights in the graph"
+    },
+    "answer": "B",
+    "solution": "Path cost accumulates by adding up every edge weight travelled along the way.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 64,
+    "topic": "Weighted Graphs",
+    "difficulty": "Moderate",
+    "question": "A minimum-weight path between two vertices is:",
+    "options": {
+      "A": "The path with the fewest edges, regardless of weight",
+      "B": "The path whose total edge weight is the smallest among all paths connecting them",
+      "C": "Any path that includes the lightest single edge in the graph",
+      "D": "A path that visits every vertex"
+    },
+    "answer": "B",
+    "solution": "It's defined by total accumulated weight, not by the number of edges used.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 65,
+    "topic": "Weighted Graphs",
+    "difficulty": "Moderate",
+    "question": "Given edge weights AB=4, BC=3, CD=5, and AD=15, compare the path A-B-C-D with the direct edge A-D.",
+    "options": {
+      "A": "A-B-C-D has total weight 12, cheaper than the direct A-D edge (15)",
+      "B": "A-B-C-D has weight 15, the same as A-D",
+      "C": "The direct edge A-D is always cheaper",
+      "D": "A-B-C-D cannot be computed without more information"
+    },
+    "answer": "A",
+    "solution": "4 + 3 + 5 = 12, which is less than the direct edge's weight of 15 — the longer route is actually cheaper here.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 66,
+    "topic": "Weighted Graphs",
+    "difficulty": "Easy",
+    "question": "A negative edge weight in a weighted graph typically represents:",
+    "options": {
+      "A": "An impossible edge",
+      "B": "A cost that behaves like a refund, gain, or discount along that edge",
+      "C": "An edge that cannot be traversed",
+      "D": "A loop"
+    },
+    "answer": "B",
+    "solution": "Negative weights model situations where traversing an edge effectively reduces total cost rather than adding to it.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 67,
+    "topic": "Weighted Graphs",
+    "difficulty": "Moderate",
+    "question": "Why can negative edge weights create difficulties in shortest-path problems?",
+    "options": {
+      "A": "They make the graph disconnected",
+      "B": "They can create negative-weight cycles, making \"shortest path\" undefined since cost could shrink indefinitely by looping",
+      "C": "They always speed up algorithms",
+      "D": "They have no real effect"
+    },
+    "answer": "B",
+    "solution": "If a cycle's total weight is negative, repeatedly looping through it drives the path cost toward negative infinity, so no true minimum exists.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 68,
+    "topic": "Weighted Graphs",
+    "difficulty": "Moderate",
+    "question": "In a weighted graph, the \"distance\" between two vertices is defined as:",
+    "options": {
+      "A": "The number of edges on the shortest path",
+      "B": "The minimum total weight over all paths connecting them",
+      "C": "The maximum edge weight in the graph",
+      "D": "The average path weight"
+    },
+    "answer": "B",
+    "solution": "Weighted distance generalizes the unweighted edge-count notion to the minimum total cost of getting between two vertices.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 69,
+    "topic": "Weighted Graphs",
+    "difficulty": "Moderate",
+    "question": "In a weighted adjacency matrix, the entry for a pair of adjacent vertices typically stores:",
+    "options": {
+      "A": "Always 1",
+      "B": "The weight of the edge connecting them (instead of just 1)",
+      "C": "The degree of each vertex",
+      "D": "Always 0"
+    },
+    "answer": "B",
+    "solution": "Unlike a plain 0/1 adjacency matrix, the weighted version records the actual edge weight at each adjacent pair.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 70,
+    "topic": "Weighted Graphs",
+    "difficulty": "Easy",
+    "question": "Which of the following is a real-life application of a weighted graph?",
+    "options": {
+      "A": "Representing road networks where edge weights are distances or travel times",
+      "B": "Representing graphs with no numerical data",
+      "C": "Only representing family trees",
+      "D": "Representing sets with no relationships"
+    },
+    "answer": "A",
+    "solution": "Road/transportation networks are a textbook example, using weights for distance, time, or cost between locations.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 71,
+    "topic": "Eulerian Graphs",
+    "difficulty": "Easy",
+    "question": "What is the difference between an Euler trail and an Euler circuit?",
+    "options": {
+      "A": "An Euler trail uses every edge exactly once and may start/end at different vertices; an Euler circuit does the same but returns to the start",
+      "B": "An Euler circuit uses every vertex exactly once",
+      "C": "They are the same",
+      "D": "An Euler trail must repeat edges"
+    },
+    "answer": "A",
+    "solution": "Both cover every edge exactly once; the circuit additionally requires ending back where it began.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 72,
+    "topic": "Eulerian Graphs",
+    "difficulty": "Easy",
+    "question": "A graph is called Eulerian if it:",
+    "options": {
+      "A": "Has no edges",
+      "B": "Contains an Euler circuit",
+      "C": "Contains a Hamiltonian cycle",
+      "D": "Is a tree"
+    },
+    "answer": "B",
+    "solution": "\"Eulerian\" specifically refers to possessing a closed walk that covers every edge exactly once.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 73,
+    "topic": "Eulerian Graphs",
+    "difficulty": "Moderate",
+    "question": "A connected graph has an Euler circuit if and only if:",
+    "options": {
+      "A": "It has exactly two odd-degree vertices",
+      "B": "Every vertex has even degree",
+      "C": "It is a tree",
+      "D": "It has no cycles"
+    },
+    "answer": "B",
+    "solution": "Euler's classical theorem: a connected graph is Eulerian precisely when every vertex has even degree.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 74,
+    "topic": "Eulerian Graphs",
+    "difficulty": "Moderate",
+    "question": "A connected graph has an Euler trail (but not an Euler circuit) if and only if it has exactly:",
+    "options": {
+      "A": "Zero odd-degree vertices",
+      "B": "Two odd-degree vertices",
+      "C": "Four odd-degree vertices",
+      "D": "All odd-degree vertices"
+    },
+    "answer": "B",
+    "solution": "Exactly two odd-degree vertices allows a trail that starts at one and ends at the other, covering every edge without closing into a circuit.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 75,
+    "topic": "Eulerian Graphs",
+    "difficulty": "Moderate",
+    "question": "Why must every vertex have even degree in a graph with an Euler circuit?",
+    "options": {
+      "A": "Because the circuit is directed",
+      "B": "Each time the circuit passes through a vertex, it uses one edge to enter and one to leave, pairing up the edges there",
+      "C": "Because the graph must be complete",
+      "D": "There is no such requirement"
+    },
+    "answer": "B",
+    "solution": "Every visit to a vertex (other than the shared start/end) consumes edges in matched entry/exit pairs, forcing an even total.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 76,
+    "topic": "Eulerian Graphs",
+    "difficulty": "Moderate",
+    "question": "A connected graph has vertex degrees 2, 2, 4, 4, and 6. Can it have an Euler circuit?",
+    "options": {
+      "A": "No, because some degrees exceed 4",
+      "B": "Yes, because all degrees are even",
+      "C": "No, because the degrees are not all equal",
+      "D": "Cannot be determined"
+    },
+    "answer": "B",
+    "solution": "Euler's theorem only requires every degree to be even — it doesn't require the degrees to be equal to each other.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 77,
+    "topic": "Eulerian Graphs",
+    "difficulty": "Moderate",
+    "question": "A connected graph has exactly two odd-degree vertices. Does it have an Euler trail?",
+    "options": {
+      "A": "No, never",
+      "B": "Yes, and the trail must start and end at those two odd-degree vertices",
+      "C": "Yes, but only if it also has an Euler circuit",
+      "D": "Cannot be determined"
+    },
+    "answer": "B",
+    "solution": "This is exactly the condition for an Euler trail, and the trail's endpoints are forced to be the two odd-degree vertices.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 78,
+    "topic": "Eulerian Graphs",
+    "difficulty": "Easy",
+    "question": "Which of these is an example of a connected graph guaranteed to be Eulerian?",
+    "options": {
+      "A": "A cycle graph C6, since every vertex has degree 2 (even)",
+      "B": "A star graph with 6 leaves",
+      "C": "A tree with 6 vertices",
+      "D": "A graph with exactly one odd-degree vertex"
+    },
+    "answer": "A",
+    "solution": "Every vertex of a cycle graph has degree 2, satisfying Euler's all-even-degree condition; trees and stars have leaves of degree 1 (odd), and a lone odd-degree vertex is impossible by the Handshaking Lemma anyway.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 79,
+    "topic": "Eulerian Graphs",
+    "difficulty": "Moderate",
+    "question": "Can a disconnected graph (with more than one nonempty component) have an Euler circuit under the usual definition?",
+    "options": {
+      "A": "Yes, always",
+      "B": "No — an Euler circuit must traverse every edge in one continuous circuit, impossible if edges are split across separate components",
+      "C": "Only if it has an even number of vertices",
+      "D": "Only if all components are complete"
+    },
+    "answer": "B",
+    "solution": "A single circuit can't jump between components with no connecting edges, so Euler circuits require connectivity (with at most one non-trivial component).",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 80,
+    "topic": "Eulerian Graphs",
+    "difficulty": "Easy",
+    "question": "Which of the following is a classic real-world application of Euler trails/circuits?",
+    "options": {
+      "A": "The Seven Bridges of Königsberg problem, and route-planning tasks like mail delivery or road inspection that must cover every street",
+      "B": "Ranking web pages",
+      "C": "Storing hierarchical file systems",
+      "D": "Finding the shortest path between two cities"
+    },
+    "answer": "A",
+    "solution": "Euler's original problem — the Seven Bridges of Königsberg — founded this area, and it directly models any task requiring every edge (street, wire, etc.) to be covered.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 81,
+    "topic": "Hamiltonian Graphs",
+    "difficulty": "Easy",
+    "question": "A Hamiltonian cycle is a cycle that:",
+    "options": {
+      "A": "Uses every edge of the graph exactly once",
+      "B": "Visits every vertex of the graph exactly once (except returning to the start)",
+      "C": "Has the maximum possible length among all cycles",
+      "D": "Only exists in complete graphs"
+    },
+    "answer": "B",
+    "solution": "Hamiltonian cycles are about covering every vertex exactly once, in contrast to Euler circuits which cover every edge.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 82,
+    "topic": "Hamiltonian Graphs",
+    "difficulty": "Easy",
+    "question": "A graph is called Hamiltonian if it contains:",
+    "options": {
+      "A": "An Euler circuit",
+      "B": "A Hamiltonian cycle",
+      "C": "No cycles at all",
+      "D": "A spanning tree"
+    },
+    "answer": "B",
+    "solution": "By definition, a Hamiltonian graph is one that possesses at least one Hamiltonian cycle.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 83,
+    "topic": "Hamiltonian Graphs",
+    "difficulty": "Moderate",
+    "question": "What is the key distinction between an Euler circuit and a Hamiltonian cycle?",
+    "options": {
+      "A": "An Euler circuit visits every edge exactly once; a Hamiltonian cycle visits every vertex exactly once (edges may be skipped)",
+      "B": "They are identical concepts",
+      "C": "A Hamiltonian cycle must use every edge",
+      "D": "An Euler circuit cannot be closed"
+    },
+    "answer": "A",
+    "solution": "One is edge-focused (Euler), the other vertex-focused (Hamiltonian) — a graph can have either, both, or neither.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 84,
+    "topic": "Hamiltonian Graphs",
+    "difficulty": "Moderate",
+    "question": "Does every complete graph Kn have a Hamiltonian cycle for n ≥ 3?",
+    "options": {
+      "A": "No, only for even n",
+      "B": "Yes — since every vertex is adjacent to every other, any ordering of the vertices forms a valid Hamiltonian cycle",
+      "C": "No, complete graphs are never Hamiltonian",
+      "D": "Only for n = 3"
+    },
+    "answer": "B",
+    "solution": "Because all edges exist in Kn, literally any cyclic arrangement of its vertices traces out a valid Hamiltonian cycle.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 85,
+    "topic": "Hamiltonian Graphs",
+    "difficulty": "Easy",
+    "question": "Is the cycle graph Cn Hamiltonian?",
+    "options": {
+      "A": "No, cycle graphs are never Hamiltonian",
+      "B": "Yes — Cn is itself a single cycle passing through all n vertices, so it is trivially Hamiltonian",
+      "C": "Only for odd n",
+      "D": "Only for n = 3"
+    },
+    "answer": "B",
+    "solution": "Cn's entire edge set already forms one cycle covering all its vertices exactly once.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 86,
+    "topic": "Hamiltonian Graphs",
+    "difficulty": "Moderate",
+    "question": "Can a graph have a Hamiltonian path but no Hamiltonian cycle?",
+    "options": {
+      "A": "No, one implies the other",
+      "B": "Yes — a simple path graph Pn has a Hamiltonian path but no Hamiltonian cycle, since its two end vertices aren't adjacent",
+      "C": "Only in directed graphs",
+      "D": "Only if the graph is complete"
+    },
+    "answer": "B",
+    "solution": "A path graph visits every vertex in a line (a Hamiltonian path) but can't close into a cycle because the endpoints have no connecting edge.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 87,
+    "topic": "Hamiltonian Graphs",
+    "difficulty": "Moderate",
+    "question": "Why can a graph containing a vertex of degree 1 never have a Hamiltonian cycle?",
+    "options": {
+      "A": "Because a Hamiltonian cycle needs exactly two edges at every vertex it passes through, which a degree-1 vertex cannot supply",
+      "B": "Because degree-1 vertices are always isolated",
+      "C": "Because Hamiltonian cycles require even degrees everywhere",
+      "D": "There is no such restriction"
+    },
+    "answer": "A",
+    "solution": "Any cycle uses one edge to enter and one to leave each vertex; a vertex with only one incident edge simply can't supply both.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 88,
+    "topic": "Hamiltonian Graphs",
+    "difficulty": "Moderate",
+    "question": "Is a star graph with four leaves (5 vertices total) Hamiltonian?",
+    "options": {
+      "A": "Yes, always",
+      "B": "No — since each leaf has degree 1, no Hamiltonian cycle can properly pass through them",
+      "C": "Only if the center is removed",
+      "D": "Yes, but only as an Euler circuit"
+    },
+    "answer": "B",
+    "solution": "Every leaf of the star has degree 1, and (as above) a degree-1 vertex blocks any Hamiltonian cycle from existing.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 89,
+    "topic": "Hamiltonian Graphs",
+    "difficulty": "Moderate",
+    "question": "Dirac's theorem states that a simple graph with n ≥ 3 vertices is Hamiltonian if:",
+    "options": {
+      "A": "Every vertex has degree at least n/2",
+      "B": "Every vertex has degree exactly 2",
+      "C": "The graph has exactly n edges",
+      "D": "The graph is a tree"
+    },
+    "answer": "A",
+    "solution": "Dirac's sufficient condition: a minimum degree of at least n/2 across all vertices guarantees a Hamiltonian cycle.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 90,
+    "topic": "Hamiltonian Graphs",
+    "difficulty": "Moderate",
+    "question": "Ore's theorem states that a graph with n ≥ 3 vertices is Hamiltonian if, for every pair of non-adjacent vertices u and v:",
+    "options": {
+      "A": "deg(u) + deg(v) ≥ n",
+      "B": "deg(u) = deg(v)",
+      "C": "deg(u) + deg(v) ≤ n",
+      "D": "deg(u) × deg(v) = n"
+    },
+    "answer": "A",
+    "solution": "Ore's theorem generalizes Dirac's: it only requires the DEGREE SUM of each non-adjacent pair to reach n, a weaker (more broadly applicable) condition.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 91,
+    "topic": "Trees: Definitions & Basic Concepts",
+    "difficulty": "Easy",
+    "question": "A tree, in graph theory, is defined as:",
+    "options": {
+      "A": "Any graph with no edges",
+      "B": "A connected, acyclic graph",
+      "C": "A graph with a cycle",
+      "D": "A disconnected graph"
+    },
+    "answer": "B",
+    "solution": "The two defining properties of a tree are connectivity and the absence of any cycle.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 92,
+    "topic": "Trees: Definitions & Basic Concepts",
+    "difficulty": "Moderate",
+    "question": "Why is a tree required to be both connected AND acyclic?",
+    "options": {
+      "A": "Connectivity ensures every vertex is reachable, while acyclicity ensures a unique path between any two vertices, with no redundant connections",
+      "B": "Neither property matters for trees",
+      "C": "Trees can have multiple disjoint parts",
+      "D": "Cycles are required in trees"
+    },
+    "answer": "A",
+    "solution": "Together, the two properties guarantee exactly one route between any pair of vertices — the hallmark of a tree structure.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 93,
+    "topic": "Trees: Definitions & Basic Concepts",
+    "difficulty": "Easy",
+    "question": "Which of the following is a real-life example naturally modeled as a tree structure?",
+    "options": {
+      "A": "A file system's folder hierarchy",
+      "B": "A social network with many overlapping friendships",
+      "C": "A road network with loops",
+      "D": "The complete graph of all flights between cities"
+    },
+    "answer": "A",
+    "solution": "Folders and subfolders branch out from a root with no cycles — a textbook tree, unlike the cyclic structures in the other options.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 94,
+    "topic": "Trees: Definitions & Basic Concepts",
+    "difficulty": "Easy",
+    "question": "In a tree, a leaf (pendant vertex) is a vertex with degree:",
+    "options": {
+      "A": "0",
+      "B": "1",
+      "C": "2",
+      "D": "Equal to the number of vertices"
+    },
+    "answer": "B",
+    "solution": "Leaves sit at the ends of branches, connected by exactly one edge to the rest of the tree.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 95,
+    "topic": "Trees: Definitions & Basic Concepts",
+    "difficulty": "Easy",
+    "question": "In a rooted tree, two vertices that share the same parent are called:",
+    "options": {
+      "A": "Ancestors",
+      "B": "Siblings",
+      "C": "Descendants",
+      "D": "Roots"
+    },
+    "answer": "B",
+    "solution": "Siblings are vertices at the same level with a common immediate parent.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 96,
+    "topic": "Trees: Definitions & Basic Concepts",
+    "difficulty": "Easy",
+    "question": "A binary tree differs from a general tree in that:",
+    "options": {
+      "A": "It must be disconnected",
+      "B": "Every vertex has at most two children",
+      "C": "It cannot have a root",
+      "D": "It must contain a cycle"
+    },
+    "answer": "B",
+    "solution": "The \"binary\" restriction caps the number of children per vertex at two; general trees allow any number of children.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 97,
+    "topic": "Trees: Definitions & Basic Concepts",
+    "difficulty": "Hard",
+    "question": "How many non-isomorphic trees exist on 4 vertices?",
+    "options": {
+      "A": "1",
+      "B": "2",
+      "C": "3",
+      "D": "4"
+    },
+    "answer": "B",
+    "solution": "Up to isomorphism there are exactly two shapes on 4 vertices: the path P4 and the star K1,3.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 98,
+    "topic": "Trees: Definitions & Basic Concepts",
+    "difficulty": "Moderate",
+    "question": "Is every tree a simple graph (no loops or multiple edges)?",
+    "options": {
+      "A": "No, trees often contain loops",
+      "B": "Yes — since a tree is acyclic, it cannot contain a loop (a 1-cycle) or a multi-edge (which would create a 2-cycle)",
+      "C": "Only for trees with an even number of vertices",
+      "D": "Trees are never simple"
+    },
+    "answer": "B",
+    "solution": "Both a loop and a pair of parallel edges are themselves tiny cycles, which the acyclicity of a tree rules out entirely.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 99,
+    "topic": "Trees: Definitions & Basic Concepts",
+    "difficulty": "Easy",
+    "question": "Can a tree contain a cycle?",
+    "options": {
+      "A": "Yes, always",
+      "B": "No — a tree is defined to be acyclic, so by definition it cannot contain any cycle",
+      "C": "Only one cycle is allowed",
+      "D": "Only if it has more than 10 vertices"
+    },
+    "answer": "B",
+    "solution": "Acyclicity is baked directly into the definition of a tree — no cycles are permitted, period.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 100,
+    "topic": "Trees: Definitions & Basic Concepts",
+    "difficulty": "Easy",
+    "question": "Can a tree be disconnected?",
+    "options": {
+      "A": "Yes, if it has more than 2 components",
+      "B": "No — a tree is defined to be connected as well as acyclic; a disconnected acyclic graph is instead called a forest",
+      "C": "Only trees with even order can be disconnected",
+      "D": "Trees are always disconnected"
+    },
+    "answer": "B",
+    "solution": "Connectivity is the other required property of a tree; drop it and you get a forest (a disjoint union of trees) instead.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 101,
+    "topic": "Properties of Trees",
+    "difficulty": "Easy",
+    "question": "A tree with n vertices has exactly how many edges?",
+    "options": {
+      "A": "n",
+      "B": "n − 1",
+      "C": "n + 1",
+      "D": "n(n−1)/2"
+    },
+    "answer": "B",
+    "solution": "This n−1 count is one of the most fundamental tree facts, provable by induction on the number of vertices.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 102,
+    "topic": "Properties of Trees",
+    "difficulty": "Moderate",
+    "question": "Every tree with at least two vertices must have at least:",
+    "options": {
+      "A": "One leaf",
+      "B": "Two leaves",
+      "C": "Three leaves",
+      "D": "n − 1 leaves"
+    },
+    "answer": "B",
+    "solution": "A tree with 2+ vertices always has at least two degree-1 vertices — intuitively, the two \"ends\" of its longest path.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 103,
+    "topic": "Properties of Trees",
+    "difficulty": "Moderate",
+    "question": "In a tree, between any two vertices, there exists:",
+    "options": {
+      "A": "No path",
+      "B": "Exactly one simple path",
+      "C": "Exactly two simple paths",
+      "D": "Infinitely many paths"
+    },
+    "answer": "B",
+    "solution": "Connectivity guarantees at least one path, and acyclicity rules out any alternative route, leaving exactly one.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 104,
+    "topic": "Properties of Trees",
+    "difficulty": "Moderate",
+    "question": "Removing any single edge from a tree:",
+    "options": {
+      "A": "Has no effect on connectivity",
+      "B": "Always disconnects the tree into exactly two components",
+      "C": "Creates a cycle",
+      "D": "Always disconnects it into n components"
+    },
+    "answer": "B",
+    "solution": "Since that edge was the tree's only connection between the vertices on either side of it, removing it splits the tree into exactly two pieces.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 105,
+    "topic": "Properties of Trees",
+    "difficulty": "Moderate",
+    "question": "Adding any single new edge to a tree:",
+    "options": {
+      "A": "Keeps it a tree",
+      "B": "Creates exactly one cycle",
+      "C": "Disconnects the tree",
+      "D": "Removes a vertex"
+    },
+    "answer": "B",
+    "solution": "The new edge connects two vertices that already had a unique path between them, closing that path into exactly one cycle.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 106,
+    "topic": "Properties of Trees",
+    "difficulty": "Easy",
+    "question": "A tree has 15 vertices. How many edges does it have?",
+    "options": {
+      "A": "14",
+      "B": "15",
+      "C": "16",
+      "D": "30"
+    },
+    "answer": "A",
+    "solution": "Using edges = n − 1: 15 − 1 = 14.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 107,
+    "topic": "Properties of Trees",
+    "difficulty": "Easy",
+    "question": "A tree has 20 edges. How many vertices does it does it have?",
+    "options": {
+      "A": "19",
+      "B": "20",
+      "C": "21",
+      "D": "40"
+    },
+    "answer": "C",
+    "solution": "Since edges = n − 1, n = edges + 1 = 20 + 1 = 21.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 108,
+    "topic": "Properties of Trees",
+    "difficulty": "Moderate",
+    "question": "A tree has 10 vertices, including 4 leaves. What can you say about the degrees of the remaining 6 vertices?",
+    "options": {
+      "A": "They must all be exactly 2",
+      "B": "Each has degree at least 2, since only leaves have degree 1 in a tree",
+      "C": "They must all be isolated",
+      "D": "They must sum to exactly 10"
+    },
+    "answer": "B",
+    "solution": "Any non-leaf vertex in a tree has degree 2 or more; only leaves are allowed the minimum degree of 1.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 109,
+    "topic": "Properties of Trees",
+    "difficulty": "Moderate",
+    "question": "Every connected graph contains:",
+    "options": {
+      "A": "At least one spanning tree, obtainable by removing edges from cycles until none remain",
+      "B": "No spanning trees",
+      "C": "Exactly one spanning tree always",
+      "D": "A Hamiltonian cycle"
+    },
+    "answer": "A",
+    "solution": "Breaking every cycle by deleting one of its edges (while staying connected) whittles any connected graph down to a spanning tree.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 110,
+    "topic": "Properties of Trees",
+    "difficulty": "Moderate",
+    "question": "If a connected graph has n vertices and exactly n − 1 edges, then it must be:",
+    "options": {
+      "A": "A cycle",
+      "B": "A tree",
+      "C": "Disconnected",
+      "D": "Complete"
+    },
+    "answer": "B",
+    "solution": "A connected graph with the minimal edge count (n−1) for connectivity has no room for a cycle, making it a tree.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 111,
+    "topic": "Spanning Trees",
+    "difficulty": "Easy",
+    "question": "A spanning tree of a graph G is:",
+    "options": {
+      "A": "Any subgraph of G with no edges",
+      "B": "A subgraph that is a tree and includes every vertex of G",
+      "C": "A tree with more vertices than G",
+      "D": "A cycle that spans all edges"
+    },
+    "answer": "B",
+    "solution": "It must be both tree-shaped (connected, acyclic) and cover every one of G's vertices.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 112,
+    "topic": "Spanning Trees",
+    "difficulty": "Moderate",
+    "question": "How does a spanning tree differ from \"a tree\" in general?",
+    "options": {
+      "A": "A spanning tree must include every vertex of some larger graph G, while \"a tree\" can be any acyclic connected graph on its own",
+      "B": "They are unrelated concepts",
+      "C": "A spanning tree can be disconnected",
+      "D": "A spanning tree never has leaves"
+    },
+    "answer": "A",
+    "solution": "\"Spanning\" tree is always relative to a specific host graph G whose vertex set it must fully cover.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 113,
+    "topic": "Spanning Trees",
+    "difficulty": "Easy",
+    "question": "True or false: every connected graph has at least one spanning tree.",
+    "options": {
+      "A": "False, only complete graphs do",
+      "B": "True",
+      "C": "False, only trees do",
+      "D": "True, but only for graphs with even order"
+    },
+    "answer": "B",
+    "solution": "As long as a graph is connected, cycle-breaking edge removal always leaves behind a spanning tree.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 114,
+    "topic": "Spanning Trees",
+    "difficulty": "Moderate",
+    "question": "How many edges does a spanning tree of the cycle graph C6 have?",
+    "options": {
+      "A": "6",
+      "B": "5",
+      "C": "4",
+      "D": "12"
+    },
+    "answer": "B",
+    "solution": "A spanning tree on 6 vertices always has 6−1 = 5 edges, obtained here by deleting any single edge of the 6-cycle.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 115,
+    "topic": "Spanning Trees",
+    "difficulty": "Easy",
+    "question": "Every spanning tree of a connected graph with n vertices must contain exactly:",
+    "options": {
+      "A": "n edges",
+      "B": "n − 1 edges",
+      "C": "n + 1 edges",
+      "D": "2n edges"
+    },
+    "answer": "B",
+    "solution": "This follows directly from the general tree fact that a tree on n vertices has n−1 edges.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 116,
+    "topic": "Spanning Trees",
+    "difficulty": "Moderate",
+    "question": "A spanning tree can be obtained from a connected graph by:",
+    "options": {
+      "A": "Adding new vertices",
+      "B": "Repeatedly removing an edge that lies on a cycle, until no cycles remain, while staying connected",
+      "C": "Removing all edges",
+      "D": "Removing all vertices except one"
+    },
+    "answer": "B",
+    "solution": "This cycle-breaking procedure preserves connectivity at every step while eliminating redundant edges one at a time.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 117,
+    "topic": "Spanning Trees",
+    "difficulty": "Moderate",
+    "question": "Can a disconnected graph have a (single) spanning tree?",
+    "options": {
+      "A": "Yes, always",
+      "B": "No — a spanning tree must be connected and include all vertices, impossible if the original graph is disconnected",
+      "C": "Only if it has exactly 2 components",
+      "D": "Yes, but only for graphs with even order"
+    },
+    "answer": "B",
+    "solution": "There's no way to connect vertices from separate components using only edges that already exist within the graph.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 118,
+    "topic": "Spanning Trees",
+    "difficulty": "Moderate",
+    "question": "A connected graph has 7 vertices and 12 edges. How many edges must be removed to obtain a spanning tree?",
+    "options": {
+      "A": "5",
+      "B": "6",
+      "C": "7",
+      "D": "12"
+    },
+    "answer": "B",
+    "solution": "A spanning tree needs 7−1 = 6 edges, so 12 − 6 = 6 edges must be removed.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 119,
+    "topic": "Spanning Trees",
+    "difficulty": "Easy",
+    "question": "In a weighted graph, a minimum spanning tree (MST) is a spanning tree that:",
+    "options": {
+      "A": "Has the fewest vertices",
+      "B": "Minimizes the total weight of its edges among all possible spanning trees",
+      "C": "Has the most edges",
+      "D": "Ignores edge weights entirely"
+    },
+    "answer": "B",
+    "solution": "Among all spanning trees of the graph, the MST is the one whose summed edge weights is smallest.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 120,
+    "topic": "Spanning Trees",
+    "difficulty": "Easy",
+    "question": "Which of the following is a practical application of spanning trees?",
+    "options": {
+      "A": "Designing a minimum-cost network (e.g. cabling or roads) that links all locations without redundant connections",
+      "B": "Sorting a list of numbers",
+      "C": "Computing the determinant of a matrix",
+      "D": "Finding prime numbers"
+    },
+    "answer": "A",
+    "solution": "Spanning (especially minimum spanning) trees are the standard tool for connecting all sites as cheaply as possible with no redundant loops.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 121,
+    "topic": "Planar Graphs",
+    "difficulty": "Easy",
+    "question": "A planar graph is a graph that:",
+    "options": {
+      "A": "Has no edges",
+      "B": "Can be drawn in the plane so that no two edges cross (except at shared endpoints)",
+      "C": "Must be a tree",
+      "D": "Must be complete"
+    },
+    "answer": "B",
+    "solution": "Planarity is about the existence of at least one crossing-free drawing, not about any particular drawing already being crossing-free.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 122,
+    "topic": "Planar Graphs",
+    "difficulty": "Moderate",
+    "question": "A \"plane graph\" refers to:",
+    "options": {
+      "A": "Any graph drawn with crossings",
+      "B": "A specific drawing of a planar graph in the plane with no edge crossings",
+      "C": "A 3-dimensional graph",
+      "D": "A graph with no vertices"
+    },
+    "answer": "B",
+    "solution": "\"Plane graph\" is the term for the actual crossing-free drawing itself, as opposed to \"planar graph,\" the abstract graph that admits one.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 123,
+    "topic": "Planar Graphs",
+    "difficulty": "Easy",
+    "question": "In a plane graph, a \"face\" (or region) refers to:",
+    "options": {
+      "A": "A vertex of high degree",
+      "B": "One of the areas of the plane bounded by edges, including the unbounded outer region",
+      "C": "An edge that crosses another",
+      "D": "The total number of vertices"
+    },
+    "answer": "B",
+    "solution": "Faces are the regions the drawing carves the plane into, always including one unbounded outer face.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 124,
+    "topic": "Planar Graphs",
+    "difficulty": "Easy",
+    "question": "Is every graph planar?",
+    "options": {
+      "A": "Yes, all graphs can be drawn without crossings",
+      "B": "No — for example, K5 and K3,3 are classic non-planar graphs",
+      "C": "Only graphs with an even number of vertices are non-planar",
+      "D": "No graph is planar"
+    },
+    "answer": "B",
+    "solution": "K5 and K3,3 are the two canonical minimal examples of graphs that can never be drawn without at least one crossing.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 125,
+    "topic": "Planar Graphs",
+    "difficulty": "Moderate",
+    "question": "Is K4 planar?",
+    "options": {
+      "A": "No, K4 is never planar",
+      "B": "Yes — K4 can be drawn with one vertex inside the triangle formed by the other three, avoiding crossings",
+      "C": "Only if drawn in 3D",
+      "D": "Only as a directed graph"
+    },
+    "answer": "B",
+    "solution": "Placing the fourth vertex inside the triangle of the other three and connecting it to each corner avoids any edge crossings.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 126,
+    "topic": "Planar Graphs",
+    "difficulty": "Hard",
+    "question": "Why is K5 non-planar?",
+    "options": {
+      "A": "It has too few edges to embed in the plane",
+      "B": "It violates the planar edge bound E ≤ 3V−6: K5 has 10 edges, exceeding the bound of 3(5)−6 = 9",
+      "C": "It has no cycles",
+      "D": "It is disconnected"
+    },
+    "answer": "B",
+    "solution": "Every simple planar graph with n ≥ 3 vertices obeys E ≤ 3n−6; K5's 10 edges exceed the allowed 9, ruling out planarity.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 127,
+    "topic": "Planar Graphs",
+    "difficulty": "Hard",
+    "question": "Why is K3,3 (the complete bipartite graph) non-planar?",
+    "options": {
+      "A": "It fails the bipartite planar edge bound E ≤ 2V−4: K3,3 has 9 edges, exceeding the bound of 2(6)−4 = 8",
+      "B": "It has no vertices",
+      "C": "It is always disconnected",
+      "D": "It contains a loop"
+    },
+    "answer": "A",
+    "solution": "Because K3,3 is triangle-free (bipartite), its planar edge bound tightens to 2n−4; its 9 edges exceed the allowed 8.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 128,
+    "topic": "Planar Graphs",
+    "difficulty": "Easy",
+    "question": "Euler's formula for a connected planar graph states that:",
+    "options": {
+      "A": "V + E − F = 2",
+      "B": "V − E + F = 2",
+      "C": "V × E × F = 2",
+      "D": "V = E = F"
+    },
+    "answer": "B",
+    "solution": "This is the classic relation linking vertices, edges, and faces of any connected plane graph.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 129,
+    "topic": "Planar Graphs",
+    "difficulty": "Moderate",
+    "question": "A connected planar graph has 8 vertices and 12 edges. Using Euler's formula, how many faces does it have?",
+    "options": {
+      "A": "4",
+      "B": "6",
+      "C": "8",
+      "D": "20"
+    },
+    "answer": "B",
+    "solution": "V − E + F = 2 → 8 − 12 + F = 2 → F = 6.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 130,
+    "topic": "Planar Graphs",
+    "difficulty": "Moderate",
+    "question": "For a simple connected planar graph with n ≥ 3 vertices, the number of edges is bounded above by:",
+    "options": {
+      "A": "n",
+      "B": "n − 1",
+      "C": "3n − 6",
+      "D": "n(n−1)/2"
+    },
+    "answer": "C",
+    "solution": "This bound follows from Euler's formula together with the fact that each face is bounded by at least 3 edges; it's the standard quick test used to rule out planarity (as with K5).",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 131,
+    "topic": "Basic Results & Applications",
+    "difficulty": "Easy",
+    "question": "The sum of the degrees of all vertices of an undirected graph with m edges equals:",
+    "options": {
+      "A": "m",
+      "B": "2m",
+      "C": "m/2",
+      "D": "m²"
+    },
+    "answer": "B",
+    "solution": "This is the Handshaking Lemma itself: every edge contributes exactly 2 to the total degree sum (one for each endpoint).",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 132,
+    "topic": "Basic Results & Applications",
+    "difficulty": "Easy",
+    "question": "In a simple graph with 9 vertices, the maximum possible degree of any single vertex is:",
+    "options": {
+      "A": "9",
+      "B": "8",
+      "C": "10",
+      "D": "4"
+    },
+    "answer": "B",
+    "solution": "A vertex can be adjacent to at most all of the other 8 vertices in the graph.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 133,
+    "topic": "Basic Results & Applications",
+    "difficulty": "Easy",
+    "question": "A simple graph with n vertices has at most how many edges?",
+    "options": {
+      "A": "n",
+      "B": "n − 1",
+      "C": "n(n−1)/2",
+      "D": "2^n"
+    },
+    "answer": "C",
+    "solution": "This maximum is achieved exactly by the complete graph Kn.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 134,
+    "topic": "Basic Results & Applications",
+    "difficulty": "Moderate",
+    "question": "Which statement correctly relates a graph's order, size, and vertex degrees?",
+    "options": {
+      "A": "Order = number of edges; size = number of vertices",
+      "B": "Size = number of vertices; the sum of degrees = the order",
+      "C": "Order = number of vertices; size = number of edges; and the sum of all degrees equals twice the size",
+      "D": "There is no relationship between them"
+    },
+    "answer": "C",
+    "solution": "Order and size are the vertex and edge counts respectively, tied together by the Handshaking Lemma (degree sum = 2 × size).",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 135,
+    "topic": "Basic Results & Applications",
+    "difficulty": "Moderate",
+    "question": "A graph has 6 vertices with degrees 1, 2, 2, 3, 4, and 4. Is this degree sequence possible?",
+    "options": {
+      "A": "No, because the sum of degrees (16) is odd",
+      "B": "Yes, because the sum of degrees (16) is even, satisfying the Handshaking Lemma's necessary condition",
+      "C": "No, because there are too many vertices",
+      "D": "Cannot be determined"
+    },
+    "answer": "B",
+    "solution": "1+2+2+3+4+4 = 16, an even number, which is the necessary parity condition the Handshaking Lemma imposes on any valid degree sequence.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 136,
+    "topic": "Basic Results & Applications",
+    "difficulty": "Easy",
+    "question": "How can graphs model social networks?",
+    "options": {
+      "A": "Vertices represent people, and edges represent relationships or connections between them",
+      "B": "Vertices represent numbers only",
+      "C": "Graphs cannot model social networks",
+      "D": "Only directed graphs can represent people"
+    },
+    "answer": "A",
+    "solution": "This person-as-vertex, relationship-as-edge model is the standard way social networks are represented as graphs.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 137,
+    "topic": "Basic Results & Applications",
+    "difficulty": "Easy",
+    "question": "How can weighted graphs represent road networks?",
+    "options": {
+      "A": "Vertices represent intersections/cities, and edge weights represent distances, travel times, or costs",
+      "B": "Weights represent the number of vertices only",
+      "C": "Road networks cannot be modeled with graphs",
+      "D": "Edge weights must always be zero"
+    },
+    "answer": "A",
+    "solution": "Locations become vertices and roads become weighted edges, with the weight capturing whatever cost metric matters (distance, time, tolls).",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 138,
+    "topic": "Basic Results & Applications",
+    "difficulty": "Easy",
+    "question": "How can directed graphs model web pages and hyperlinks?",
+    "options": {
+      "A": "Vertices represent web pages, and directed edges represent hyperlinks pointing from one page to another",
+      "B": "Only undirected graphs can represent the web",
+      "C": "Vertices represent hyperlinks only",
+      "D": "Web pages cannot be modeled as graphs"
+    },
+    "answer": "A",
+    "solution": "Since a hyperlink points one way (from page A to page B), a directed edge naturally captures that asymmetry.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 139,
+    "topic": "Basic Results & Applications",
+    "difficulty": "Moderate",
+    "question": "Why are trees a natural model for file systems and organizational hierarchies?",
+    "options": {
+      "A": "Because they can have cycles, matching real hierarchies",
+      "B": "Because each item (file/folder or employee) has exactly one parent, mirroring the acyclic, hierarchical structure of a tree",
+      "C": "Because file systems have no structure",
+      "D": "Trees cannot represent hierarchies"
+    },
+    "answer": "B",
+    "solution": "The single-parent, no-cycles structure of a hierarchy is exactly what a tree formalizes.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 140,
+    "topic": "Basic Results & Applications",
+    "difficulty": "Moderate",
+    "question": "Why are planar graphs useful in map design and circuit layout?",
+    "options": {
+      "A": "Because their non-crossing structure mirrors constraints like non-overlapping map regions or non-crossing circuit wires",
+      "B": "Because they always have the maximum number of edges",
+      "C": "Planar graphs are never used in real applications",
+      "D": "Because they must be complete graphs"
+    },
+    "answer": "A",
+    "solution": "A crossing-free drawing directly models physical constraints where connections (roads, wires) shouldn't overlap or cross.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 141,
+    "topic": "Mixed Revision",
+    "difficulty": "Moderate",
+    "question": "Which of these correctly matches each term with its key defining property?",
+    "options": {
+      "A": "Tree = has a cycle; Complete graph = no edges; Planar graph = always disconnected",
+      "B": "Complete graph = every pair of vertices adjacent; Tree = connected and acyclic; Planar graph = can be drawn without edge crossings",
+      "C": "They are all the same type of graph",
+      "D": "Simple graph = allows loops and multiple edges"
+    },
+    "answer": "B",
+    "solution": "Each definition captures the term's essential property: universal adjacency for complete graphs, connected+acyclic for trees, crossing-free drawability for planar graphs.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 142,
+    "topic": "Mixed Revision",
+    "difficulty": "Moderate",
+    "question": "Eulerian and Hamiltonian graphs differ in what they must \"cover\":",
+    "options": {
+      "A": "An Eulerian graph's circuit covers every edge exactly once; a Hamiltonian graph's cycle covers every vertex exactly once",
+      "B": "Both cover exactly the same thing",
+      "C": "Eulerian graphs cover vertices; Hamiltonian graphs cover edges",
+      "D": "Neither covers anything specific"
+    },
+    "answer": "A",
+    "solution": "This edge-vs-vertex distinction is the fundamental difference between the two concepts.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 143,
+    "topic": "Mixed Revision",
+    "difficulty": "Moderate",
+    "question": "A connected graph has 10 vertices and 9 edges. What can you conclude?",
+    "options": {
+      "A": "It must contain a cycle",
+      "B": "It must be a tree, since 9 = 10 − 1 and it is connected",
+      "C": "It must be disconnected",
+      "D": "It must be complete"
+    },
+    "answer": "B",
+    "solution": "Connected plus exactly n−1 edges is precisely the characterization of a tree.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 144,
+    "topic": "Mixed Revision",
+    "difficulty": "Hard",
+    "question": "A graph has 7 vertices and 21 edges. Can it be simple?",
+    "options": {
+      "A": "Yes — the maximum for a simple graph on 7 vertices is 7·6/2 = 21, so it can be simple, and in fact it must be K7",
+      "B": "No, 21 is too many edges for any simple graph",
+      "C": "Yes, but only if it's a tree",
+      "D": "Cannot be determined"
+    },
+    "answer": "A",
+    "solution": "21 exactly matches the maximum possible edge count C(7,2) = 21, which is only achieved when every possible edge is present — i.e. the graph is K7.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 145,
+    "topic": "Mixed Revision",
+    "difficulty": "Moderate",
+    "question": "A connected graph has exactly four odd-degree vertices. Can it have an Euler circuit or an Euler trail?",
+    "options": {
+      "A": "It has an Euler circuit",
+      "B": "It has an Euler trail but not a circuit",
+      "C": "It has neither, since Euler circuits require zero odd-degree vertices and Euler trails require exactly two",
+      "D": "Cannot be determined"
+    },
+    "answer": "C",
+    "solution": "Four odd-degree vertices satisfies neither Euler condition (0 for a circuit, exactly 2 for a trail), so this graph has neither.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 146,
+    "topic": "Mixed Revision",
+    "difficulty": "Moderate",
+    "question": "If a graph contains a Hamiltonian cycle, what can you conclude about the minimum degree of each vertex?",
+    "options": {
+      "A": "Every vertex must have degree at least 2, since the cycle uses two edges at each vertex it passes through",
+      "B": "Every vertex must have degree exactly n − 1",
+      "C": "At least one vertex must have degree 0",
+      "D": "No conclusion can be drawn"
+    },
+    "answer": "A",
+    "solution": "Every vertex on the Hamiltonian cycle needs one edge in and one edge out, guaranteeing degree at least 2.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 147,
+    "topic": "Mixed Revision",
+    "difficulty": "Moderate",
+    "question": "How can a spanning tree help simplify a network while preserving connectivity?",
+    "options": {
+      "A": "It removes all vertices from the network",
+      "B": "It keeps all vertices connected using the minimum number of edges (n−1), eliminating redundant/cyclic connections",
+      "C": "It disconnects the network into separate parts",
+      "D": "It adds extra edges to the network"
+    },
+    "answer": "B",
+    "solution": "By stripping away every edge not needed for connectivity, a spanning tree gives the leanest possible connected version of the network.",
+    "unit": 4,
+    "kind": "mcq"
+  },
+  {
+    "num": 148,
+    "topic": "Mixed Revision",
+    "difficulty": "Moderate",
+    "question": "Which pairing below is correctly matched?",
+    "options": {
+      "A": "Euler circuit — traverses every edge exactly once and returns to start; Hamiltonian cycle — visits every vertex exactly once and returns to start",
+      "B": "Euler circuit — visits every vertex; Hamiltonian cycle — traverses every edge",
+      "C": "A spanning tree always contains a cycle",
+      "D": "A path must revisit vertices"
+    },
+    "answer": "A",
+    "solution": "This correctly summarizes the edge-covering nature of Euler circuits versus the vertex-covering nature of Hamiltonian cycles.",
+    "unit": 4,
+    "kind": "mcq"
   }
 ];
