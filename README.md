@@ -10,7 +10,12 @@ the same multiple-choice test mechanic:
 
 All units share Exam mode (timed, answers hidden) and Practice mode
 (instant feedback), full/quick/topic-wise practice options, scoring, a
-topic-by-topic breakdown, and a 3D Venn-diagram hero built with Three.js.
+topic-by-topic breakdown, and a full 3D interface built with Three.js —
+a drifting 3D background, tilting 3D cards, a rotatable 3D diagram that
+illustrates the concept behind each question's topic (Venn diagrams,
+function mappings, matrices, graphs, recursion trees, Tower of Hanoi,
+pigeonhole boxes, intersecting planes, function curves), and a 3D
+topic-performance chart on the results screen.
 
 ## Files
 
@@ -18,9 +23,25 @@ topic-by-topic breakdown, and a 3D Venn-diagram hero built with Three.js.
 - `questions.js` — the embedded question bank (all units)
 - `style.css` — all styling
 - `app.js` — app logic (test flow, scoring, review, keyboard shortcuts)
-- `three.min.js` — vendored Three.js r128 (used for the interactive hero)
+- `three.min.js` — vendored Three.js r128
+- `three-scene.js` — the shared 3D viewer, topic-aware explanation diagrams, results chart, background, and card-tilt interaction
+- `security.js` — clickjacking guard (see Security below)
+- `_headers` — HTTP security headers for hosts that support them (Netlify, Cloudflare Pages); ignored by GitHub Pages
 
 No build step, no dependencies to install — it's plain HTML/CSS/JS.
+
+## Security
+
+- A strict `Content-Security-Policy` (script/style locked to same-origin,
+  everything else denied) and `Referrer-Policy: no-referrer` are set in
+  `index.html`. Every dynamic string written to the DOM is HTML-escaped.
+- `security.js` best-effort-busts the page out of a third-party iframe,
+  since GitHub Pages can't send an `X-Frame-Options` header and the
+  `<meta>` form of CSP ignores `frame-ancestors`.
+- If you deploy somewhere that supports custom HTTP headers (Netlify,
+  Cloudflare Pages, Vercel with a rewrite), the included `_headers` file
+  adds the header-only protections (real `frame-ancestors`, `nosniff`,
+  a locked-down `Permissions-Policy`) on top of the above.
 
 ## Deploy on GitHub Pages
 

@@ -145,7 +145,7 @@ main{ flex:1; width:100%; }
 }
 
 .mode-toggle{
-  display:inline-flex; margin-top:38px; border:1px solid var(--line); border-radius:999px; padding:3px;
+  display:inline-flex; gap:3px; margin-top:38px; border:1px solid var(--line); border-radius:999px; padding:3px;
   background:var(--surface);
 }
 .mode-toggle-btn{
@@ -156,7 +156,7 @@ main{ flex:1; width:100%; }
 .mode-toggle-hint{ font-size:13px; color:var(--ink-soft); margin-top:10px; }
 
 .unit-toggle{
-  display:inline-flex; border:1px solid var(--line); border-radius:999px; padding:3px;
+  display:inline-flex; gap:3px; border:1px solid var(--line); border-radius:999px; padding:3px;
   background:var(--surface); margin-bottom:26px;
 }
 .unit-toggle-btn{
@@ -349,4 +349,42 @@ main{ flex:1; width:100%; }
   .diff-row{ grid-template-columns:76px 1fr 44px; }
   .topic-row{ grid-template-columns:1fr 70px 34px; }
   .score-num{ font-size:44px; }
+  .explain3d-canvas{ height:170px; }
+  .explain3d-wrap--chart .explain3d-canvas{ height:200px; }
 }
+
+/* ===================================================================
+   FULL-PAGE 3D BACKGROUND (Three.js, progressive enhancement)
+   ===================================================================== */
+html, body{ background:transparent; }
+#bg3d{
+  position:fixed; inset:0; z-index:-2; pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 50% at 18% -8%, rgba(44,74,158,0.07), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 88% 108%, rgba(193,68,61,0.06), transparent 60%),
+    var(--paper);
+}
+#bg3d canvas{ display:block; width:100% !important; height:100% !important; }
+
+/* ---------- 3D tilt targets: give the hover/press lift somewhere to land ---------- */
+.mode-card, .topic-chip, .unit-toggle-btn, .mode-toggle-btn{ will-change:transform; }
+
+/* ===================================================================
+   3D EXPLANATION / TOPIC-CHART PANELS
+   ===================================================================== */
+.explain3d-wrap{
+  margin-top:14px; padding:14px 16px 16px; border-radius:var(--radius-m);
+  background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--overlap);
+}
+.explain3d-label{
+  font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.04em;
+  text-transform:uppercase; color:var(--overlap); margin:0 0 8px;
+}
+.explain3d-canvas{
+  width:100%; height:210px; cursor:grab; border-radius:var(--radius-s);
+  overflow:hidden; background:var(--paper);
+}
+.explain3d-canvas canvas{ display:block; width:100% !important; height:100% !important; }
+.explain3d-hint{ font-size:11px; color:var(--ink-soft); margin:8px 0 0; text-align:center; }
+.explain3d-wrap--chart{ border-left-color:var(--set-a); margin-bottom:26px; }
+.explain3d-wrap--chart .explain3d-canvas{ height:260px; }

@@ -204,6 +204,10 @@
     });
     $('topbar').hidden = (name !== 'test');
     $('jump-strip').hidden = (name !== 'test');
+    if (window.Explain3D) {
+      if (name !== 'test') { $('explain3d-wrap').hidden = true; window.Explain3D.unmount($('explain3d')); }
+      if (name !== 'results') { $('explain3d-chart-wrap').hidden = true; window.Explain3D.unmount($('explain3d-chart')); }
+    }
     window.scrollTo(0,0);
   }
 
@@ -410,9 +414,17 @@
       panel.className = 'feedback-panel ' + (isCorrect ? 'is-correct' : 'is-wrong');
       panel.innerHTML = '<b>' + (isCorrect ? 'Correct.' : 'Not quite \u2014 correct answer is ' + escapeHtml(q.answer) + '.') + '</b> ' +
         escapeHtml(q.solution);
+      if (window.Explain3D) {
+        $('explain3d-wrap').hidden = false;
+        window.Explain3D.mount($('explain3d'), q);
+      }
     } else {
       panel.hidden = true;
       panel.innerHTML = '';
+      if (window.Explain3D) {
+        $('explain3d-wrap').hidden = true;
+        window.Explain3D.unmount($('explain3d'));
+      }
     }
 
     var markBtn = $('btn-mark');
@@ -596,6 +608,13 @@
       return { topic: t, correct: b.correct, wrong: b.wrong, total: b.total, pct: b.total ? b.correct / b.total : 0 };
     }).sort(function(a, b2){ return a.pct - b2.pct; });
 
+    if (window.Explain3D && topicRows.length) {
+      $('explain3d-chart-wrap').hidden = false;
+      window.Explain3D.mountTopicChart($('explain3d-chart'), topicRows.slice(0, 8));
+    } else if ($('explain3d-chart-wrap')) {
+      $('explain3d-chart-wrap').hidden = true;
+    }
+
     html += '<h3 class="section-title">By topic <span class="subtle-note">\u2014 weakest first</span></h3><div class="topic-rows">';
     topicRows.forEach(function(tr){
       var cPct = tr.total ? (tr.correct / tr.total) * 100 : 0;
@@ -698,100 +717,18 @@
   /* ---------------- 3D Venn hero (Three.js, progressive enhancement) ---------------- */
   function initVennHero(){
     var container = $('venn3d');
-    if (!container || typeof THREE === 'undefined') return false;
-    try {
-      var w = container.clientWidth, h = container.clientHeight;
-      if (!w || !h) return false;
-
-      var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      renderer.setSize(w, h);
-      container.appendChild(renderer.domElement);
-
-      var scene = new THREE.Scene();
-      var camera = new THREE.PerspectiveCamera(38, w / h, 0.1, 100);
-      camera.position.set(0, 0, 7);
-
-      var group = new THREE.Group();
-      scene.add(group);
-
-      var geo = new THREE.SphereGeometry(1.55, 48, 48);
-      var matA = new THREE.MeshPhongMaterial({ color: 0x2C4A9E, transparent: true, opacity: 0.72, shininess: 60 });
-      var matB = new THREE.MeshPhongMaterial({ color: 0xC1443D, transparent: true, opacity: 0.72, shininess: 60 });
-      var sphereA = new THREE.Mesh(geo, matA);
-      var sphereB = new THREE.Mesh(geo, matB);
-      sphereA.position.x = -0.95;
-      sphereB.position.x = 0.95;
-      group.add(sphereA, sphereB);
-
-      scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-      var dir1 = new THREE.DirectionalLight(0xffffff, 0.9);
-      dir1.position.set(3, 4, 5);
-      scene.add(dir1);
-      var dir2 = new THREE.DirectionalLight(0xffffff, 0.35);
-      dir2.position.set(-4, -2, -3);
-      scene.add(dir2);
-
-      var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      var dragging = false, lastX = 0, lastY = 0, velX = 0, velY = 0;
-      /**
-       * @param {(PointerEvent|TouchEvent)} e
-       */
-      function pos(e){
-        if ('touches' in e && e.touches && e.touches.length) return e.touches[0];
-        return /** @type {PointerEvent} */ (e);
-      }
-      /**
-       * @param {(PointerEvent|TouchEvent)} e
-       */
-      function onDown(e){ dragging = true; var p = pos(e); lastX = p.clientX; lastY = p.clientY; container.style.cursor = 'grabbing'; }
-      /**
-       * @param {(PointerEvent|TouchEvent)} e
-       */
-      function onMove(e){
-        if (!dragging) return;
-        var p = pos(e);
-        velY = (p.clientX - lastX) * 0.006;
-        velX = (p.clientY - lastY) * 0.006;
-        group.rotation.y += velY;
-        group.rotation.x += velX;
-        lastX = p.clientX; lastY = p.clientY;
-      }
-      function onUp(){ dragging = false; container.style.cursor = 'grab'; }
-
-      renderer.domElement.addEventListener('pointerdown', onDown);
-      window.addEventListener('pointermove', onMove);
-      window.addEventListener('pointerup', onUp);
-      renderer.domElement.addEventListener('touchstart', onDown, { passive: true });
-      window.addEventListener('touchmove', onMove, { passive: true });
-      window.addEventListener('touchend', onUp);
-
-      window.addEventListener('resize', function(){
-        var w2 = container.clientWidth, h2 = container.clientHeight;
-        if (!w2 || !h2) return;
-        camera.aspect = w2 / h2;
-        camera.updateProjectionMatrix();
-        renderer.setSize(w2, h2);
-      });
-
-      var clock = new THREE.Clock();
-      function animate(){
-        requestAnimationFrame(animate);
-        var dt = Math.min(clock.getDelta(), 0.05);
-        if (!dragging) {
-          if (!reducedMotion) group.rotation.y += dt * 0.18;
-          velX *= 0.94; velY *= 0.94;
-          group.rotation.x += velX * 0.4;
-          group.rotation.y += velY * 0.4;
-        }
-        renderer.render(scene, camera);
-      }
-      animate();
-      return true;
-    } catch (e) {
-      return false;
-    }
+    if (!container || !window.Explain3D) return false;
+    var viewer = window.Explain3D.createViewer(container, { fov: 38, camZ: 7, idleSpin: 0.18 });
+    if (!viewer) return false;
+    var geo = new THREE.SphereGeometry(1.55, 48, 48);
+    var matA = new THREE.MeshPhongMaterial({ color: 0x2C4A9E, transparent: true, opacity: 0.72, shininess: 60 });
+    var matB = new THREE.MeshPhongMaterial({ color: 0xC1443D, transparent: true, opacity: 0.72, shininess: 60 });
+    var sphereA = new THREE.Mesh(geo, matA);
+    var sphereB = new THREE.Mesh(geo, matB);
+    sphereA.position.x = -0.95;
+    sphereB.position.x = 0.95;
+    viewer.group.add(sphereA, sphereB);
+    return true;
   }
 
   /* ---------------- keyboard shortcuts ---------------- */

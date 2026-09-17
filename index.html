@@ -3,12 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none';">
-<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none';">
+<meta name="referrer" content="no-referrer">
+<script src="security.js"></script>
 <title>Mock Test Site — Unit I–IV</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div id="bg3d" aria-hidden="true"></div>
 <div id="app">
 
   <header class="topbar" id="topbar" hidden>
@@ -96,6 +98,11 @@
       <h2 class="q-stem" id="q-stem"></h2>
       <div class="options" id="options"></div>
       <div class="feedback-panel" id="feedback-panel" hidden></div>
+      <div class="explain3d-wrap" id="explain3d-wrap" hidden>
+        <p class="explain3d-label">This topic, in 3D</p>
+        <div class="explain3d-canvas" id="explain3d"></div>
+        <p class="explain3d-hint">Drag to rotate</p>
+      </div>
       <div class="test-actions">
         <button type="button" class="btn btn-ghost" id="btn-mark">Mark for review</button>
         <div class="nav-buttons">
@@ -106,6 +113,11 @@
     </section>
 
     <section id="screen-results" class="screen" hidden>
+      <div class="explain3d-wrap explain3d-wrap--chart" id="explain3d-chart-wrap" hidden>
+        <p class="explain3d-label">Weakest topics, in 3D</p>
+        <div class="explain3d-canvas explain3d-canvas--chart" id="explain3d-chart"></div>
+        <p class="explain3d-hint">Drag to rotate</p>
+      </div>
       <div id="results-content"></div>
     </section>
 
@@ -128,6 +140,7 @@
 
 <script src="questions.js"></script>
 <script src="three.min.js"></script>
+<script src="three-scene.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
