@@ -359,6 +359,9 @@ main{ flex:1; width:100%; }
 html, body{ background:transparent; }
 #bg3d{
   position:fixed; inset:0; z-index:-2; pointer-events:none;
+  transform:translateZ(0); -webkit-transform:translateZ(0);
+  backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  will-change:transform;
   background:
     radial-gradient(ellipse 60% 50% at 18% -8%, rgba(44,74,158,0.07), transparent 60%),
     radial-gradient(ellipse 60% 50% at 88% 108%, rgba(193,68,61,0.06), transparent 60%),

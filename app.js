@@ -562,8 +562,8 @@
     };
 
     state.reviewFilter = 'all';
-    renderResults();
     showScreen('results');
+    renderResults();
   }
 
   /**
