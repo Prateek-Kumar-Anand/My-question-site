@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none';">
 <meta name="referrer" content="no-referrer">
 <script src="security.js"></script>
-<title>Mock Test Site — Unit I–IV</title>
+<title>Mock Test Site — Unit I–IV & Python</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -25,7 +25,12 @@
   <main id="main">
 
     <section id="screen-start" class="screen">
-      <div class="unit-toggle" role="radiogroup" aria-label="Unit">
+      <div class="unit-toggle section-toggle" id="section-toggle" role="radiogroup" aria-label="Section">
+        <button type="button" class="unit-toggle-btn section-toggle-btn active" data-section="math">Maths</button>
+        <button type="button" class="unit-toggle-btn section-toggle-btn" data-section="python">Python</button>
+      </div>
+
+      <div class="unit-toggle" id="unit-toggle" role="radiogroup" aria-label="Unit">
         <button type="button" class="unit-toggle-btn active" data-unit="1">Unit I</button>
         <button type="button" class="unit-toggle-btn" data-unit="2">Unit II</button>
         <button type="button" class="unit-toggle-btn" data-unit="3">Unit III</button>
@@ -113,11 +118,6 @@
     </section>
 
     <section id="screen-results" class="screen" hidden>
-      <div class="explain3d-wrap explain3d-wrap--chart" id="explain3d-chart-wrap" hidden>
-        <p class="explain3d-label">Weakest topics, in 3D</p>
-        <div class="explain3d-canvas explain3d-canvas--chart" id="explain3d-chart"></div>
-        <p class="explain3d-hint">Drag to rotate</p>
-      </div>
       <div id="results-content"></div>
     </section>
 
@@ -138,7 +138,8 @@
 
 </div>
 
-<script src="questions.js"></script>
+<script src="questions-math.js"></script>
+<script src="questions-python.js"></script>
 <script src="three.min.js"></script>
 <script src="three-scene.js"></script>
 <script src="app.js"></script>

@@ -3,8 +3,7 @@
      Venn diagram (app.js), the per-topic explanation diagrams, and the
      results 3D chart
    - topic-aware diagram builders + router (Explain3D.mount)
-   - the results screen's 3D topic-performance chart (Explain3D.mountTopicChart)
-   - a persistent full-page background of drifting wireframe shapes
+   - a persistent full-page background of static wireframe shapes
    - a lightweight pointer-tilt effect for cards/chips/pills
    Everything here is a progressive enhancement: if WebGL/Three.js is
    unavailable, the site behaves exactly as it did before this file existed. */
@@ -12,7 +11,7 @@
   'use strict';
 
   if (typeof THREE === 'undefined') {
-    window.Explain3D = { mount: function(){}, unmount: function(){}, mountTopicChart: function(){}, createViewer: function(){ return null; } };
+    window.Explain3D = { mount: function(){}, unmount: function(){}, createViewer: function(){ return null; } };
     return;
   }
 
@@ -33,6 +32,11 @@
      inertia + resize + disposal. Used by every mounted 3D diagram,
      including the start-screen hero (see initVennHero in app.js).
      ================================================================ */
+  /**
+   * @param {HTMLElement} container
+   * @param {Object} [opts]
+   * @returns {?Object}
+   */
   function createViewer(container, opts) {
     opts = opts || {};
     var w = container.clientWidth, h = container.clientHeight || 220;
@@ -56,8 +60,14 @@
     var dir2 = new THREE.DirectionalLight(0xffffff, 0.3); dir2.position.set(-4, -2, -3); scene.add(dir2);
 
     var dragging = false, lastX = 0, lastY = 0, velX = 0, velY = 0;
+    /**
+     * @param {PointerEvent|TouchEvent} e
+     * @returns {{clientX: number, clientY: number}}
+     */
     function pos(e) { return ('touches' in e && e.touches && e.touches.length) ? e.touches[0] : e; }
+    /** @param {PointerEvent|TouchEvent} e */
     function onDown(e) { dragging = true; var p = pos(e); lastX = p.clientX; lastY = p.clientY; container.style.cursor = 'grabbing'; }
+    /** @param {PointerEvent|TouchEvent} e */
     function onMove(e) {
       if (!dragging) return;
       var p = pos(e);
@@ -116,6 +126,13 @@
     return { scene: scene, camera: camera, renderer: renderer, group: group, dispose: dispose };
   }
 
+  /**
+   * @param {Object} a - THREE.Vector3
+   * @param {Object} b - THREE.Vector3
+   * @param {number} color
+   * @param {number} radius
+   * @returns {Object} THREE.Mesh
+   */
   function edgeBetween(a, b, color, radius) {
     var dir = new THREE.Vector3().subVectors(b, a);
     var len = dir.length() || 0.001;
@@ -126,6 +143,11 @@
     return mesh;
   }
 
+  /**
+   * @param {string} text
+   * @param {string} [color]
+   * @returns {Object} THREE.Sprite
+   */
   function makeLabelSprite(text, color) {
     var c = document.createElement('canvas'); c.width = 256; c.height = 96;
     var ctx = c.getContext('2d');
@@ -142,6 +164,7 @@
   /* ================================================================
      TOPIC DIAGRAM BUILDERS
      ================================================================ */
+    /** @param {Object} group - THREE.Group */
   function buildVenn(group) {
     var geo = new THREE.SphereGeometry(1.4, 40, 40);
     var sa = new THREE.Mesh(geo, new THREE.MeshPhongMaterial({ color: COLORS.a, transparent: true, opacity: 0.65, shininess: 50 }));
@@ -150,6 +173,7 @@
     group.add(sa, sb);
   }
 
+    /** @param {Object} group - THREE.Group */
   function buildMapping(group) {
     var dGeo = new THREE.SphereGeometry(0.22, 20, 20);
     var matA = new THREE.MeshPhongMaterial({ color: COLORS.a });
@@ -168,6 +192,12 @@
     var l2 = makeLabelSprite('Codomain', '#C1443D'); l2.position.set(2, -2.2, 0); group.add(l2);
   }
 
+    /**
+   * @param {Object} group - THREE.Group
+   * @param {number} [rows]
+   * @param {number} [cols]
+   * @param {string} [mode]
+   */
   function buildGrid(group, rows, cols, mode) {
     rows = rows || 4; cols = cols || 4;
     var spacing = 0.62;
@@ -189,9 +219,20 @@
     group.rotation.x = -0.35;
   }
 
+    /**
+   * @param {Object} group - THREE.Group
+   * @param {number} depth
+   * @param {number} branch
+   */
   function buildCountingTree(group, depth, branch) {
     var nodeMat = new THREE.MeshPhongMaterial({ color: COLORS.a });
     var nodeGeo = new THREE.SphereGeometry(0.16, 16, 16);
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     * @param {number} d
+     */
     function place(x, y, z, d) {
       var m = new THREE.Mesh(nodeGeo, nodeMat); m.position.set(x, y, z); group.add(m);
       if (d >= depth) return;
@@ -206,6 +247,7 @@
     place(0, 1.5, 0, 0);
   }
 
+    /** @param {Object} group - THREE.Group */
   function buildPigeonhole(group) {
     var holes = 4, counts = [1, 1, 1, 2];
     var spacing = 0.85, startX = -((holes - 1) * spacing) / 2;
@@ -228,6 +270,7 @@
     }
   }
 
+    /** @param {Object} group - THREE.Group */
   function buildHanoi(group) {
     var pegMat = new THREE.MeshPhongMaterial({ color: COLORS.inkSoft });
     [-1.3, 0, 1.3].forEach(function (x) {
@@ -246,6 +289,7 @@
     }
   }
 
+    /** @param {Object} group - THREE.Group */
   function buildSpiral(group) {
     var steps = 10, prev = null;
     for (var i = 0; i < steps; i++) {
@@ -261,6 +305,7 @@
     }
   }
 
+    /** @param {Object} group - THREE.Group */
   function buildPlanes(group) {
     var geo = new THREE.PlaneGeometry(2.6, 2.6);
     var defs = [[COLORS.a, 0, 0, 0], [COLORS.b, 0, Math.PI / 2.6, 0], [COLORS.overlap, Math.PI / 2.4, 0, 0.3]];
@@ -272,12 +317,20 @@
     group.add(new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), new THREE.MeshPhongMaterial({ color: COLORS.ink })));
   }
 
+    /**
+   * @param {Object} group - THREE.Group
+   * @param {number} len
+   */
   function buildAxes(group, len) {
     var mat = new THREE.LineBasicMaterial({ color: COLORS.line });
     group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-len, 0, 0), new THREE.Vector3(len, 0, 0)]), mat));
     group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, -len * 0.6, 0), new THREE.Vector3(0, len * 0.6, 0)]), mat));
   }
 
+    /**
+   * @param {Object} group - THREE.Group
+   * @param {string} kind
+   */
   function buildCurve(group, kind) {
     buildAxes(group, 2.7);
     var i;
@@ -303,6 +356,10 @@
     group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 80, 0.045, 8, false), new THREE.MeshPhongMaterial({ color: COLORS.a })));
   }
 
+    /**
+   * @param {Object} group - THREE.Group
+   * @param {Object} cfg
+   */
   function buildGraph(group, cfg) {
     var n = cfg.nodeCount || 7;
     var nodeGeo = new THREE.SphereGeometry(0.14, 16, 16);
@@ -347,6 +404,11 @@
   }
 
   /* ---------------- topic → diagram routing ---------------- */
+    /**
+   * @param {number} unit
+   * @param {string} topic
+   * @returns {Object}
+   */
   function diagramFor(unit, topic) {
     var t = (topic || '').toLowerCase();
     if (unit === 1) {
@@ -367,13 +429,29 @@
       if (/system|linear equations/.test(t)) return { type: 'planes' };
       return { type: 'grid', rows: 4, cols: 4, mode: 'matrix' };
     }
-    if (/tree|spanning/.test(t)) return { type: 'graph', tree: true, nodeCount: 9 };
-    if (/complete graph/.test(t)) return { type: 'graph', complete: true, nodeCount: 6 };
-    if (/directed|digraph/.test(t)) return { type: 'graph', directed: true, nodeCount: 7 };
-    if (/planar/.test(t)) return { type: 'graph', planar: true, nodeCount: 7 };
-    return { type: 'graph', nodeCount: 7 };
+    if (unit === 4) {
+      if (/tree|spanning/.test(t)) return { type: 'graph', tree: true, nodeCount: 9 };
+      if (/complete graph/.test(t)) return { type: 'graph', complete: true, nodeCount: 6 };
+      if (/directed|digraph/.test(t)) return { type: 'graph', directed: true, nodeCount: 7 };
+      if (/planar/.test(t)) return { type: 'graph', planar: true, nodeCount: 7 };
+      return { type: 'graph', nodeCount: 7 };
+    }
+    if (unit === 5) {
+      if (/^sets$/.test(t)) return { type: 'venn' };
+      if (/^lists$|^tuples$|slicing/.test(t)) return { type: 'grid', rows: 4, cols: 4, mode: 'cartesian' };
+      if (/variables|data types/.test(t)) return { type: 'grid', rows: 3, cols: 3, mode: 'cartesian' };
+      if (/conditional/.test(t)) return { type: 'tree', depth: 3, branch: 2 };
+      if (/scope|namespaces/.test(t)) return { type: 'tree', depth: 2, branch: 1 };
+      if (/loops|loop control|iteration|map, filter|reduce/.test(t)) return { type: 'spiral' };
+      return { type: 'mapping' };
+    }
+    return { type: 'mapping' };
   }
 
+    /**
+   * @param {Object} group - THREE.Group
+   * @param {Object} cfg
+   */
   function build(group, cfg) {
     switch (cfg.type) {
       case 'venn': return buildVenn(group);
@@ -392,6 +470,7 @@
   /* ================================================================
      PUBLIC API — mount/unmount a topic diagram, or the results chart
      ================================================================ */
+    /** @param {?HTMLElement} container */
   function unmount(container) {
     if (!container) return;
     if (container._explain3d) { container._explain3d.dispose(); container._explain3d = null; }
@@ -399,6 +478,10 @@
     container.innerHTML = '';
   }
 
+    /**
+   * @param {?HTMLElement} container
+   * @param {Object} question
+   */
   function mount(container, question) {
     if (!container || !question) return;
     var key = question.unit + ':' + question.topic + ':' + question.num;
@@ -413,35 +496,7 @@
     } catch (e) { /* fail silently — the text explanation still works */ }
   }
 
-  function mountTopicChart(container, rows) {
-    if (!container || !rows || !rows.length) return;
-    unmount(container);
-    try {
-      var n = rows.length, spacing = 0.85;
-      var viewer = createViewer(container, { camY: 2.1, camZ: Math.max(6, n * 0.85), fov: 34 });
-      if (!viewer) return;
-      var startX = -((n - 1) * spacing) / 2;
-      rows.forEach(function (row, idx) {
-        var pct = row.pct != null ? row.pct : (row.total ? row.correct / row.total : 0);
-        var h = 0.3 + pct * 2.6;
-        var color = pct < 0.5 ? COLORS.b : (pct < 0.8 ? 0x9C7A2E : COLORS.correct);
-        var mesh = new THREE.Mesh(new THREE.BoxGeometry(0.5, h, 0.5), new THREE.MeshPhongMaterial({ color: color, shininess: 40 }));
-        mesh.position.set(startX + idx * spacing, h / 2 - 1.1, 0);
-        viewer.group.add(mesh);
-        var label = makeLabelSprite(row.topic.length > 9 ? row.topic.slice(0, 8) + '\u2026' : row.topic, '#4B5266');
-        label.position.set(startX + idx * spacing, -1.45, 0);
-        label.scale.set(0.9, 0.34, 1);
-        viewer.group.add(label);
-      });
-      var base = new THREE.Mesh(new THREE.BoxGeometry(n * spacing + 0.6, 0.06, 1), new THREE.MeshPhongMaterial({ color: COLORS.line }));
-      base.position.set(0, -1.13, 0);
-      viewer.group.add(base);
-      viewer.group.rotation.x = -0.1;
-      container._explain3d = viewer;
-    } catch (e) { /* fail silently */ }
-  }
-
-  window.Explain3D = { mount: mount, unmount: unmount, mountTopicChart: mountTopicChart, createViewer: createViewer };
+  window.Explain3D = { mount: mount, unmount: unmount, createViewer: createViewer };
 
   /* ================================================================
      PERSISTENT FULL-PAGE BACKGROUND
@@ -461,7 +516,6 @@
       camera.position.set(0, 0, 14);
 
       var colors = [COLORS.a, COLORS.b, COLORS.overlap, COLORS.correct];
-      var shapes = [];
       var count = w < 700 ? 7 : 14;
       for (var i = 0; i < count; i++) {
         var kind = i % 3;
@@ -472,43 +526,20 @@
         var mesh = new THREE.Mesh(geo, mat);
         mesh.position.set((Math.random() - 0.5) * 20, (Math.random() - 0.5) * 14, (Math.random() - 0.5) * 8 - 4);
         mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
-        mesh.userData.spin = (Math.random() * 0.3 + 0.08) * (Math.random() < 0.5 ? -1 : 1);
-        mesh.userData.drift = (Math.random() - 0.5) * 0.15;
         scene.add(mesh);
-        shapes.push(mesh);
       }
 
-      var mouseX = 0, mouseY = 0;
-      window.addEventListener('mousemove', function (e) {
-        mouseX = (e.clientX / window.innerWidth - 0.5);
-        mouseY = (e.clientY / window.innerHeight - 0.5);
-      });
+      renderer.render(scene, camera);
 
+      // Redraw only on resize (e.g. rotating the device) — never on a
+      // running clock, so there's nothing to perceive as "moving".
       window.addEventListener('resize', function () {
         var w2 = window.innerWidth, h2 = window.innerHeight;
-        camera.aspect = w2 / h2; camera.updateProjectionMatrix(); renderer.setSize(w2, h2);
-      });
-
-      var paused = false;
-      document.addEventListener('visibilitychange', function () { paused = document.hidden; });
-
-      var clock = new THREE.Clock();
-      (function animate() {
-        requestAnimationFrame(animate);
-        if (paused) return;
-        var dt = Math.min(clock.getDelta(), 0.05);
-        if (!reducedMotion) {
-          shapes.forEach(function (m) {
-            m.rotation.x += dt * m.userData.spin * 0.4;
-            m.rotation.y += dt * m.userData.spin;
-            m.position.y += Math.sin(clock.elapsedTime * 0.3 + m.position.x) * dt * m.userData.drift;
-          });
-          camera.position.x += (mouseX * 1.2 - camera.position.x) * 0.02;
-          camera.position.y += (-mouseY * 1.2 - camera.position.y) * 0.02;
-          camera.lookAt(0, 0, 0);
-        }
+        if (!w2 || !h2) return;
+        camera.aspect = w2 / h2; camera.updateProjectionMatrix();
+        renderer.setSize(w2, h2);
         renderer.render(scene, camera);
-      })();
+      });
     } catch (e) { /* WebGL unavailable — page still works, just without the background */ }
   }
 
@@ -522,18 +553,24 @@
 
     var current = null;
 
+    /**
+     * @param {HTMLElement} el
+     * @param {number} px
+     * @param {number} py
+     */
     function apply(el, px, py) {
       el.style.transition = 'transform .08s linear, box-shadow .08s linear';
       el.style.transform = 'perspective(700px) rotateX(' + (py * -7) + 'deg) rotateY(' + (px * 9) + 'deg) translateZ(6px)';
       el.style.boxShadow = '0 16px 26px -14px rgba(27,34,48,.35)';
     }
+    /** @param {HTMLElement} el */
     function reset(el) {
       el.style.transition = 'transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease';
       el.style.transform = '';
       el.style.boxShadow = '';
     }
 
-    document.addEventListener('mousemove', function (e) {
+    document.addEventListener('mousemove', /** @param {MouseEvent} e */ function (e) {
       var el = e.target && e.target.closest ? e.target.closest(SELECTOR) : null;
       if (el !== current) {
         if (current) reset(current);
@@ -544,11 +581,12 @@
       apply(el, (e.clientX - r.left) / r.width - 0.5, (e.clientY - r.top) / r.height - 0.5);
     });
 
-    document.addEventListener('mouseout', function (e) {
+    document.addEventListener('mouseout', /** @param {MouseEvent} e */ function (e) {
       if (!e.relatedTarget && current) { reset(current); current = null; }
     });
   }
 
+  /** @param {function(): void} fn */
   function ready(fn) {
     if (document.readyState !== 'loading') fn();
     else document.addEventListener('DOMContentLoaded', fn);

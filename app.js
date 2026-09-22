@@ -2,7 +2,7 @@
   "use strict";
 
   /**
-   * One multiple-choice question, as stored in questions.js.
+   * One multiple-choice question, as stored in questions-math.js / questions-python.js.
    * @typedef {Object} Question
    * @property {number} num
    * @property {string} topic
@@ -84,6 +84,12 @@
       headline: 'Elementary Graph Theory',
       subhead: 'A mock test built from your own Unit IV question bank, with a detailed solution behind every question.',
       reportTitle: 'Elementary Graph Theory \u2014 Unit IV Mock Test Report'
+    },
+    5: {
+      wordmark: 'Python \u2014 Programming Fundamentals',
+      headline: 'Python Programming',
+      subhead: 'A mock test built from your own Python question bank, with a detailed solution behind every question.',
+      reportTitle: 'Python Programming \u2014 Mock Test Report'
     }
   };
 
@@ -204,10 +210,7 @@
     });
     $('topbar').hidden = (name !== 'test');
     $('jump-strip').hidden = (name !== 'test');
-    if (window.Explain3D) {
-      if (name !== 'test') { $('explain3d-wrap').hidden = true; window.Explain3D.unmount($('explain3d')); }
-      if (name !== 'results') { $('explain3d-chart-wrap').hidden = true; window.Explain3D.unmount($('explain3d-chart')); }
-    }
+    if (window.Explain3D && name !== 'test') { $('explain3d-wrap').hidden = true; window.Explain3D.unmount($('explain3d')); }
     window.scrollTo(0,0);
   }
 
@@ -275,9 +278,24 @@
       : 'See the correct answer and solution right after each question, no clock.';
   }
 
-  document.querySelectorAll('.unit-toggle-btn').forEach(function(btn){
+  document.querySelectorAll('.section-toggle-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
-      activateToggle('.unit-toggle-btn', btn);
+      activateToggle('.section-toggle-btn', btn);
+      var section = btn.getAttribute('data-section');
+      if (section === 'python') {
+        $('unit-toggle').hidden = true;
+        applyUnitUI(5);
+      } else {
+        $('unit-toggle').hidden = false;
+        activateToggle('.unit-toggle-btn[data-unit]', document.querySelector('.unit-toggle-btn[data-unit="1"]'));
+        applyUnitUI(1);
+      }
+    });
+  });
+
+  document.querySelectorAll('.unit-toggle-btn[data-unit]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      activateToggle('.unit-toggle-btn[data-unit]', btn);
       applyUnitUI(parseInt(btn.getAttribute('data-unit'), 10));
     });
   });
@@ -607,13 +625,6 @@
       var b = r.byTopic[t];
       return { topic: t, correct: b.correct, wrong: b.wrong, total: b.total, pct: b.total ? b.correct / b.total : 0 };
     }).sort(function(a, b2){ return a.pct - b2.pct; });
-
-    if (window.Explain3D && topicRows.length) {
-      $('explain3d-chart-wrap').hidden = false;
-      window.Explain3D.mountTopicChart($('explain3d-chart'), topicRows.slice(0, 8));
-    } else if ($('explain3d-chart-wrap')) {
-      $('explain3d-chart-wrap').hidden = true;
-    }
 
     html += '<h3 class="section-title">By topic <span class="subtle-note">\u2014 weakest first</span></h3><div class="topic-rows">';
     topicRows.forEach(function(tr){
